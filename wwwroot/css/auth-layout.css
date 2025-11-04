@@ -1,0 +1,80 @@
+﻿/* ========== AUTH LAYOUT (nền và bố cục) ========== */
+
+:root {
+    --primary: #2563eb;
+    --success: #16a34a;
+    --text-dark: #222;
+    --bg-light: #ffffff;
+    --shadow: rgba(0, 0, 0, 0.1);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(135deg, #4f46e5, #06b6d4);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Card chính */
+.auth-container {
+    background: var(--bg-light);
+    border-radius: 16px;
+    box-shadow: 0 10px 25px var(--shadow);
+    padding: 40px 35px;
+    width: 100%;
+    max-width: 420px;
+    box-sizing: border-box;
+    animation: fadeIn 0.5s ease;
+}
+
+/* Tiêu đề */
+.auth-title {
+    text-align: center;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+    letter-spacing: 0.5px;
+}
+
+/* Footer nhỏ */
+.auth-footer {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+    .auth-footer a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+/* Hiệu ứng vào */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .auth-container {
+        padding: 30px 20px;
+        margin: 10px;
+    }
+}

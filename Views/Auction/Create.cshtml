@@ -1,0 +1,59 @@
+@model MyApp.Models.Auction
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4>Tạo phiên đấu giá</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3">
+                            <label class="form-label">Tên sản phẩm</label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Mô tả</label>
+                            <textarea asp-for="Description" class="form-control"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Ảnh (URL)</label>
+                            <input asp-for="ImgUrl" class="form-control" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Giá khởi điểm</label>
+                            <input asp-for="PriceStart" type="number" class="form-control" />
+                            <span asp-validation-for="PriceStart" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Thời gian bắt đầu</label>
+                            <input asp-for="TimeStart" type="datetime-local" class="form-control" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Thời gian kết thúc</label>
+                            <input asp-for="TimeEnd" type="datetime-local" class="form-control" />
+                            <span asp-validation-for="TimeEnd" class="text-danger"></span>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-success">Tạo đấu giá</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

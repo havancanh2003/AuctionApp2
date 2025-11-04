@@ -1,0 +1,66 @@
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@model IEnumerable<MyApp.Models.Payment>
+<h2>Danh sách don hang</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Sản phẩm</th>
+            <th>Người thắng</th>
+            <th>Giá</th>
+            <th>Ngày tạo</th>
+            <th>Trạng thái</th>
+            
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var payment in Model)
+        {
+            <tr>
+                <td>@payment.Auction.Name</td>
+                <td>@payment.User.Name</td>
+                <td>@payment.Price</td>
+                <td>@payment.CreatedAt.ToString("HH:mm:ss dd/MM/yyyy")</td>
+                <td>
+                    <select class="form-control status-dropdown" data-id="@payment.Id" data-status="@((int)payment.Status)">
+                        @foreach (PaymentStatus status in Enum.GetValues(typeof(PaymentStatus)))
+                        {
+                            <option value="@((int)status)" selected="@(payment.Status == status)">
+                                @status.ToString()
+                            </option>
+                        }
+                    </select>
+                </td>
+
+
+            </tr>
+        }
+    </tbody>
+</table>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.status-dropdown').change(function () {
+                var paymentId = $(this).data('id');
+                var newStatus = $(this).val();
+
+                $.ajax({
+                    url: '@Url.Action("UpdatePaymentStatus", "Payment")',
+                    type: 'POST',
+                    data: {
+                        paymentId: paymentId,
+                        newStatus: newStatus
+                    },
+                    success: function () {
+                        alert('Trạng thái đã được cập nhật thành công.');
+                    },
+                    error: function () {
+                        alert('Đã xảy ra lỗi khi cập nhật trạng thái.');
+                    }
+                });
+            });
+        });
+    </script>
+}

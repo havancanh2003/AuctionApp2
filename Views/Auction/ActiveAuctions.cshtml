@@ -1,0 +1,46 @@
+@model IEnumerable<MyApp.Models.Auction>
+@section Styles {
+
+<style>
+  @* .table-hover-row:hover {
+    background-color:rgb(34, 134, 227); /* màu xanh Bootstrap */
+    color: rgb(34, 134, 227);
+  } *@
+
+  .table-hover-row:hover td {
+    background-color:rgb(115, 179, 240);
+    color: rgb(1, 5, 9);
+  }
+
+  .table-hover-row {
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+</style>
+
+}
+<h2 class="text-center">Phiên đấu giá đang diễn ra</h2>
+
+<table class="table">
+    <thead>
+        <tr class="text-center">
+            <th>Tiêu đề</th>
+            <th>Ảnh</th>
+            <th>Mô tả</th>
+            <th>Kết thúc</th>
+            <th>Giá Khởi Điểm</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var auction in Model)
+        {
+            <tr class="table-hover-row" style="cursor:pointer;" onclick="window.location.href='@Url.Action("Details", "Auction", new { id = auction.Id })'">
+
+                <td>@auction.Name</td>
+                <td><img src="@auction.ImgUrl" alt="Ảnh sản phẩm @auction.Name" class="img-fluid" style="max-height: 100px;" /></td>
+                <td>@auction.Description</td>
+                <td>@auction.TimeEnd.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@auction.PriceStart.ToString("N0") VNĐ</td>
+            </tr>
+        }
+    </tbody>
+</table>

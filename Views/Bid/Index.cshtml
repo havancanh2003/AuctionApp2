@@ -1,0 +1,30 @@
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@model IEnumerable<MyApp.Models.Bid>
+<h2>Danh sách don hang</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Sản phẩm</th>
+            <th>Người Đặt</th>
+            <th>Giá</th>
+            <th>Ngày tạo</th>
+            
+            
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var bid in Model)
+        {
+            <tr>
+                <td>@bid.Auction.Name</td>
+                <td>@bid.User.Name</td>
+                <td>@bid.Price</td>
+                <td>@bid.Time.ToString("HH:mm:ss dd/MM/yyyy")</td>
+            
+            </tr>
+        }
+    </tbody>
+</table>

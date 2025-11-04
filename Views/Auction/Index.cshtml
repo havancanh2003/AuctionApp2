@@ -1,0 +1,66 @@
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@model IEnumerable<MyApp.Models.Auction>
+<h2>Danh sách phiên đấu giá</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Sản phẩm</th>
+            <th>Người Đặt</th>
+            <th>Giá</th>
+            <th>Thời gian bắt đầu</th>
+            <th>Thời gian kết thúc</th>
+            <th>Trạng thái</th>
+            
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var auction in Model)
+        {
+            <tr>
+                <td>@auction.Name</td>
+                <td>@auction.User.Name</td>
+                <td>@auction.PriceStart</td>
+                <td>@auction.TimeStart.ToString("HH:mm:ss dd/MM/yyyy")</td>
+                <td>@auction.TimeEnd.ToString("HH:mm:ss dd/MM/yyyy")</td>
+                <td>
+                    <select class="form-control status-dropdown" data-id="@auction.Id" data-status="@((int)auction.Status)">
+                        @foreach (AuctionStatus status in Enum.GetValues(typeof(AuctionStatus)))
+                        {
+                            <option value="@((int)status)" selected="@(auction.Status == status)">
+                                @status.ToString()
+                            </option>
+                        }
+                    </select>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.status-dropdown').change(function () {
+                var auctionId = $(this).data('id');
+                console.log(auctionId);
+                var newStatus = $(this).val();
+
+                $.ajax({
+                    url: '@Url.Action("UpdateStatus", "Auction")',
+                    type: 'POST',
+                    data: {
+                        auctionId: auctionId,
+                        status: newStatus
+                    },
+                    success: function () {
+                        alert('Trạng thái đã được cập nhật thành công.');
+                    },
+                    error: function () {
+                        alert('Đã xảy ra lỗi khi cập nhật trạng thái.');
+                    }
+                });
+            });
+        });
+    </script>
+}
