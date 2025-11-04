@@ -1,0 +1,447 @@
+﻿@using MyApp.Dtos
+@model MyApp.Dtos.UserManagementViewModel
+@{
+    ViewData["Title"] = "Quản Lý Người Dùng";
+    // Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header mb-4">
+        <h1 class="page-title">
+            <i class="fas fa-users-cog me-2"></i>
+            Quản Lý Người Dùng
+        </h1>
+        <p class="page-subtitle text-muted">Quản lý tất cả người dùng trong hệ thống</p>
+    </div>
+
+    <!-- Filters Card -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Bộ Lọc & Tìm Kiếm</h6>
+        </div>
+        <div class="card-body">
+            <form method="get" asp-action="UserManagement" class="row g-3">
+                <div class="col-md-6">
+                    <label for="search" class="form-label">Tìm kiếm</label>
+                    <input type="text" class="form-control" id="search" name="search"
+                           value="@Model.Search" placeholder="Tìm theo tên, email, số điện thoại...">
+                </div>
+                <div class="col-md-4">
+                    <label for="role" class="form-label">Vai trò</label>
+                    <select class="form-control" id="role" name="role">
+                        @foreach (var role in ViewBag.Roles)
+                        {
+                            <option value="@role.Value" selected="@(Model.SelectedRole == role.Value)">
+                                @role.Text
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-2"></i>Tìm Kiếm
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Users Table Card -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Danh Sách Người Dùng</h6>
+            <span class="badge bg-primary">@Model.TotalUsers người dùng</span>
+        </div>
+        <div class="card-body">
+            @if (!Model.Users.Any())
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Không tìm thấy người dùng nào</h5>
+                    <p class="text-muted">Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm.</p>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover" id="usersTable" width="100%" cellspacing="0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Thông Tin</th>
+                                <th>Vai Trò</th>
+                                <th>Trạng Thái</th>
+                                <th>Ngày Tạo</th>
+                                <th>Đăng Nhập Cuối</th>
+                                <th>Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in Model.Users)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle bg-primary text-white rounded-circle me-3 d-flex align-items-center justify-content-center"
+                                                 style="width: 40px; height: 40px; font-size: 1rem;">
+                                                @user.Name.Substring(0, 1).ToUpper()
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">@user.Name</div>
+                                                <div class="text-muted small">@user.Email</div>
+                                                @if (!string.IsNullOrEmpty(user.Phone))
+                                                {
+                                                    <div class="text-muted small">
+                                                        <i class="fas fa-phone me-1"></i>@user.Phone
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <select class="form-select form-select-sm role-select"
+                                                data-user-id="@user.Id"
+                                                data-current-role="@user.Role">
+                                            @foreach (RoleTypeEnum role in Enum.GetValues(typeof(RoleTypeEnum)))
+                                            {
+                                                <option value="@((int)role)" selected="@(user.Role == (int)role)">
+                                                    @GetRoleDisplayName(role)
+                                                </option>
+                                            }
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="status-badge me-2 @(user.IsActived ? "bg-success" : "bg-danger")"></div>
+                                            <span class="badge @(user.IsActived ? "bg-success" : "bg-danger")">
+                                                @(user.IsActived ? "Đang hoạt động" : "Đã khóa")
+                                            </span>
+                                        </div>
+                                        @if (!user.EmailConfirmed)
+                                        {
+                                            <small class="text-warning d-block mt-1">
+                                                <i class="fas fa-exclamation-triangle me-1"></i>Chưa xác thực email
+                                            </small>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="text-nowrap">
+                                            <div>@user.CreatedAt.ToString("dd/MM/yyyy")</div>
+                                            <small class="text-muted">@user.CreatedAt.ToString("HH:mm")</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if (user.LastLoginDate.HasValue)
+                                        {
+                                            <div class="text-nowrap">
+                                                <div>@user.LastLoginDate.Value.ToString("dd/MM/yyyy")</div>
+                                                <small class="text-muted">@user.LastLoginDate.Value.ToString("HH:mm")</small>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Chưa đăng nhập</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a asp-action="UserDetails" asp-route-id="@user.Id"
+                                               class="btn btn-outline-primary" title="Xem chi tiết">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <button class="btn @(user.IsActived ? "btn-outline-warning" : "btn-outline-success") toggle-status-btn"
+                                                    data-user-id="@user.Id"
+                                                    data-user-name="@user.Name"
+                                                    title="@(user.IsActived ? "Khóa tài khoản" : "Kích hoạt tài khoản")">
+                                                <i class="fas @(user.IsActived ? "fa-lock" : "fa-unlock")"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger delete-user-btn"
+                                                    data-user-id="@user.Id"
+                                                    data-user-name="@user.Name"
+                                                    title="Xóa người dùng">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                @if (Model.TotalPages > 1)
+                {
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center mt-4">
+                            <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                                <a class="page-link" href="@Url.Action("UserManagement", new { search = Model.Search, role = Model.SelectedRole, page = Model.Page - 1, pageSize = Model.PageSize })">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+
+                            @for (int i = 1; i <= Model.TotalPages; i++)
+                            {
+                                <li class="page-item @(i == Model.Page ? "active" : "")">
+                                    <a class="page-link" href="@Url.Action("UserManagement", new { search = Model.Search, role = Model.SelectedRole, page = i, pageSize = Model.PageSize })">
+                                        @i
+                                    </a>
+                                </li>
+                            }
+
+                            <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
+                                <a class="page-link" href="@Url.Action("UserManagement", new { search = Model.Search, role = Model.SelectedRole, page = Model.Page + 1, pageSize = Model.PageSize })">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Xác Nhận</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modalMessage">
+                <!-- Message will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="confirmAction">Xác Nhận</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Đây là phần tiếp theo của file User Management view, phần script -->
+    <script>
+        $(document).ready(function() {
+             // Role change handler
+        $('.role-select').change(function() {
+            var userId = $(this).data('user-id');
+            var newRole = $(this).val();
+            var currentRole = $(this).data('current-role');
+
+            if (newRole == currentRole) return;
+
+            $.ajax({
+                url: '@Url.Action("UpdateUserRole", "Admin")',
+                type: 'POST',
+                data: {
+                    id: userId,
+                    newRole: newRole
+                },
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        showToast('success', response.message);
+                        // Reload page to reflect changes
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        showToast('error', response.message);
+                        // Revert selection
+                        $(this).val(currentRole);
+                    }
+                },
+                error: function() {
+                    showToast('error', 'Đã xảy ra lỗi khi cập nhật vai trò.');
+                    $(this).val(currentRole);
+                }
+            });
+        });
+
+                $('.toggle-status-btn').click(function() {
+                var userId = $(this).data('user-id');
+                var userName = $(this).data('user-name');
+                var isActive = $(this).hasClass('btn-outline-warning');
+
+                $('#modalTitle').text(isActive ? 'Khóa Tài Khoản' : 'Kích Hoạt Tài Khoản');
+                $('#modalMessage').text(isActive
+                    ? `Bạn có chắc muốn khóa tài khoản của "${userName}"? Người dùng này sẽ không thể đăng nhập.`
+                    : `Bạn có chắc muốn kích hoạt tài khoản của "${userName}"?`
+                );
+
+                $('#confirmAction').off('click').on('click', function() {
+                    $.ajax({
+                        url: '@Url.Action("ToggleUserStatus", "Admin")',
+                        type: 'POST',
+                        data: { id: userId },
+                        headers: {
+                            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                showToast('success', response.message);
+                                $('#confirmationModal').modal('hide');
+                                // Update button appearance without reloading
+                                var btn = $('.toggle-status-btn[data-user-id="' + userId + '"]');
+                                if (response.isActive) {
+                                    btn.removeClass('btn-outline-success').addClass('btn-outline-warning');
+                                    btn.find('i').removeClass('fa-unlock').addClass('fa-lock');
+                                    btn.closest('tr').find('.status-badge').removeClass('bg-danger').addClass('bg-success');
+                                    btn.closest('tr').find('.badge').removeClass('bg-danger').addClass('bg-success').text('Đang hoạt động');
+                                } else {
+                                    btn.removeClass('btn-outline-warning').addClass('btn-outline-success');
+                                    btn.find('i').removeClass('fa-lock').addClass('fa-unlock');
+                                    btn.closest('tr').find('.status-badge').removeClass('bg-success').addClass('bg-danger');
+                                    btn.closest('tr').find('.badge').removeClass('bg-success').addClass('bg-danger').text('Đã khóa');
+                                }
+                            } else {
+                                showToast('error', response.message);
+                                $('#confirmationModal').modal('hide');
+                            }
+                        },
+                        error: function() {
+                            showToast('error', 'Đã xảy ra lỗi khi cập nhật trạng thái.');
+                            $('#confirmationModal').modal('hide');
+                        }
+                    });
+                });
+
+                $('#confirmationModal').modal('show');
+            });
+
+            // Delete user
+            $('.delete-user-btn').click(function() {
+                var userId = $(this).data('user-id');
+                var userName = $(this).data('user-name');
+
+                $('#modalTitle').text('Xóa Người Dùng');
+                $('#modalMessage').text(`Bạn có chắc muốn xóa vĩnh viễn người dùng "${userName}"? Hành động này không thể hoàn tác. Tất cả dữ liệu liên quan sẽ bị mất.`);
+
+                $('#confirmAction').off('click').on('click', function() {
+                    $.ajax({
+                        url: '@Url.Action("DeleteUser", "Admin")',
+                        type: 'POST',
+                        data: { id: userId },
+                        headers: {
+                            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                showToast('success', response.message);
+                                $('#confirmationModal').modal('hide');
+                                // Remove user row from table
+                                $('tr').has('.delete-user-btn[data-user-id="' + userId + '"]').fadeOut(300, function() {
+                                    $(this).remove();
+                                    // Update total users count
+                                    var totalUsers = parseInt($('.card-header .badge').text().split(' ')[0]) - 1;
+                                    $('.card-header .badge').text(totalUsers + ' người dùng');
+                                });
+                            } else {
+                                showToast('error', response.message);
+                                $('#confirmationModal').modal('hide');
+                            }
+                        },
+                        error: function() {
+                            showToast('error', 'Đã xảy ra lỗi khi xóa người dùng.');
+                            $('#confirmationModal').modal('hide');
+                        }
+                    });
+                });
+
+                $('#confirmationModal').modal('show');
+            });
+
+            // Toast notification function
+            function showToast(type, message) {
+                var toast = `<div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0" role="alert">
+                                <div class="d-flex">
+                                    <div class="toast-body">${message}</div>
+                                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                                </div>
+                             </div>`;
+                $('.toast-container').append(toast);
+                $('.toast').last().toast('show');
+                setTimeout(() => {
+                    $('.toast').last().toast('hide');
+                    setTimeout(() => $('.toast').last().remove(), 500);
+                }, 5000);
+            }
+
+            // Auto-refresh user statistics
+            setInterval(function() {
+                $.get('@Url.Action("GetUserStatistics", "Admin")', function(data) {
+                    if (!data.error) {
+                        // Update statistics in dashboard if we're on that page
+                        if (window.location.pathname.includes('Dashboard')) {
+                            updateDashboardStats(data);
+                        }
+                    }
+                });
+            }, 30000); // Refresh every 30 seconds
+        });
+
+        function updateDashboardStats(data) {
+            $('.card-border-left-primary .h5').text(data.totalUsers);
+            $('.card-border-left-success .h5').text(data.activeUsers);
+            $('.card-border-left-info .h5').text(data.newUsersToday);
+
+            // Update user role chart if it exists
+            if (window.userRoleChart) {
+                window.userRoleChart.data.datasets[0].data = Object.values(data.usersByRole);
+                window.userRoleChart.update();
+            }
+        }
+        });
+    </script>
+    <style>
+        .avatar-circle {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-badge {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            color: #6c757d;
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1055;
+        }
+
+        .btn-group-sm > .btn {
+            padding: 0.25rem 0.5rem;
+        }
+    </style>
+}
+
+@functions {
+    public string GetRoleDisplayName(RoleTypeEnum role)
+    {
+        return role switch
+        {
+            RoleTypeEnum.Admin => "Quản trị viên",
+            RoleTypeEnum.Customer => "Người mua",
+            RoleTypeEnum.Seller => "Người bán",
+            _ => role.ToString()
+        };
+    }
+}

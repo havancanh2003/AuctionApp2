@@ -1,22 +1,42 @@
-﻿@{
-    Layout = null;
-    var title = ViewData["Title"] ?? "Xác thực";
-}
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@title - MyApp</title>
-    <link rel="stylesheet" href="~/css/auth-layout.css" />
-    <link rel="stylesheet" href="~/css/auth-form.css" />
+    <title>@ViewData["Title"] - AuctionHouse</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
-<body>
+<body class="auth-body">
     <div class="auth-container">
-        @RenderBody()
+        <div class="auth-card">
+            <div class="auth-header">
+                <a asp-controller="Home" asp-action="Index" class="auth-logo">
+                    <i class="fas fa-gavel me-2"></i>
+                    <span>AuctionHouse</span>
+                </a>
+                <h1 class="auth-title">@ViewData["Title"]</h1>
+            </div>
+
+            <div class="auth-content">
+                @RenderBody()
+            </div>
+
+            <div class="auth-footer">
+                <p>&copy; 2025 AuctionHouse. Phạm Đức Anh - Bảo Nguyên - Hà Văn Cảnh</p>
+            </div>
+        </div>
+
+        <div class="auth-background">
+            <div class="background-overlay"></div>
+        </div>
     </div>
 
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -1,0 +1,198 @@
+﻿@model IEnumerable<Bid>
+@{
+    ViewData["Title"] = "Lịch Sử Đấu Giá Của Tôi";
+}
+
+<div class="container">
+    <div class="page-header mb-4">
+        <h1 class="page-title">
+            <i class="fas fa-history text-primary me-2"></i>
+            @ViewData["Title"]
+        </h1>
+        <p class="page-subtitle text-muted">Theo dõi tất cả các lượt đấu giá bạn đã tham gia</p>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h5 class="card-title mb-0">Tổng quan đấu giá</h5>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <div class="btn-group">
+                                <button class="btn btn-outline-primary btn-sm" id="exportBtn">
+                                    <i class="fas fa-download me-1"></i>Xuất PDF
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm" id="refreshBtn">
+                                    <i class="fas fa-sync-alt me-1"></i>Làm mới
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (!Model.Any())
+                    {
+                        <div class="empty-state text-center py-5">
+                            <i class="fas fa-gavel fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">Chưa có lịch sử đấu giá</h4>
+                            <p class="text-muted mb-4">Bạn chưa tham gia đấu giá phiên nào.</p>
+                            <a asp-controller="Auction" asp-action="ActiveAuctions" class="btn btn-primary">
+                                <i class="fas fa-bolt me-2"></i>Tham gia đấu giá ngay
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Sản phẩm</th>
+                                        <th>Giá đấu</th>
+                                        <th>Thời gian</th>
+                                        <th>Trạng thái</th>
+                                        <th>Vị trí</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var bid in Model.OrderByDescending(b => b.BidTime))
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="@bid.Auction?.ImgUrl"
+                                                         alt="@bid.Auction?.Name"
+                                                         class="rounded me-3"
+                                                         style="width: 50px; height: 50px; object-fit: cover;">
+                                                    <div>
+                                                        <div class="fw-bold">@bid.Auction?.Name</div>
+                                                        <small class="text-muted">Giá khởi điểm: @bid.Auction?.PriceStart.ToString("N0") ₫</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="fw-bold text-primary">@bid.Price.ToString("N0") ₫</span>
+                                            </td>
+                                            <td>
+                                                <div class="text-nowrap">
+                                                    <div>@bid.BidTime.ToString("HH:mm")</div>
+                                                    <small class="text-muted">@bid.BidTime.ToString("dd/MM/yyyy")</small>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @if (bid.IsWinning)
+                                                {
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-trophy me-1"></i>Đang thắng
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning">
+                                                        <i class="fas fa-clock me-1"></i>Đã bị vượt
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @{
+                                                    var bidPosition = bid.Auction?.Bids?.Count(b => b.Price > bid.Price) + 1 ?? 1;
+                                                }
+                                                <span class="badge bg-info">#@bidPosition</span>
+                                            </td>
+                                            <td>
+                                                <a asp-controller="Auction" asp-action="Details" asp-route-id="@bid.AuctionID"
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-external-link-alt me-1"></i>Xem
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Summary Statistics -->
+                        <div class="row mt-4">
+                            <div class="col-md-3">
+                                <div class="card bg-primary text-white">
+                                    <div class="card-body text-center">
+                                        <h4>@Model.Count()</h4>
+                                        <small>Tổng lượt đấu</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-success text-white">
+                                    <div class="card-body text-center">
+                                        <h4>@Model.Count(b => b.IsWinning)</h4>
+                                        <small>Đang thắng</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-warning text-white">
+                                    <div class="card-body text-center">
+                                        <h4>@Model.Count(b => !b.IsWinning)</h4>
+                                        <small>Đã bị vượt</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-info text-white">
+                                    <div class="card-body text-center">
+                                        <h4>@Model.Select(b => b.AuctionID).Distinct().Count()</h4>
+                                        <small>Phiên tham gia</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#refreshBtn').click(function() {
+                location.reload();
+            });
+
+            $('#exportBtn').click(function() {
+                // Implement PDF export functionality
+                alert('Tính năng xuất PDF sẽ được triển khai sau!');
+            });
+        });
+    </script>
+
+    <style>
+        .empty-state {
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            color: #6c757d;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+        }
+
+        .card .card {
+            border: none;
+            border-radius: 10px;
+        }
+    </style>
+}

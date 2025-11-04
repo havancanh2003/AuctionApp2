@@ -1,0 +1,187 @@
+﻿@model IEnumerable<Payment>
+@{
+    ViewData["Title"] = "Thanh Toán Của Tôi";
+}
+
+<div class="container">
+    <div class="page-header mb-4">
+        <h1 class="page-title">
+            <i class="fas fa-receipt text-primary me-2"></i>
+            @ViewData["Title"]
+        </h1>
+        <p class="page-subtitle text-muted">Quản lý tất cả các thanh toán của bạn</p>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h5 class="card-title mb-0">Lịch sử thanh toán</h5>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <div class="btn-group">
+                                <button class="btn btn-outline-secondary btn-sm" id="refreshBtn">
+                                    <i class="fas fa-sync-alt me-1"></i>Làm mới
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (!Model.Any())
+                    {
+                        <div class="empty-state text-center py-5">
+                            <i class="fas fa-credit-card fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">Chưa có thanh toán nào</h4>
+                            <p class="text-muted">Bạn chưa có giao dịch thanh toán nào.</p>
+                            <a asp-controller="Auction" asp-action="MyAuctions" class="btn btn-primary">
+                                <i class="fas fa-gavel me-2"></i>Xem phiên đấu giá của tôi
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Sản phẩm</th>
+                                        <th>Số tiền</th>
+                                        <th>Ngày tạo</th>
+                                        <th>Cập nhật</th>
+                                        <th>Trạng thái</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var payment in Model.OrderByDescending(p => p.CreatedAt))
+                                    {
+                                        var statusText = payment.Status switch
+                                        {
+                                            PaymentStatus.Unpaid => "Chưa thanh toán",
+                                            PaymentStatus.InTransit => "Đang xử lý",
+                                            PaymentStatus.Complete => "Hoàn thành",
+                                            _ => payment.Status.ToString()
+                                        };
+
+                                        var statusClass = payment.Status switch
+                                        {
+                                            PaymentStatus.Unpaid => "warning",
+                                            PaymentStatus.InTransit => "info",
+                                            PaymentStatus.Complete => "success",
+                                            _ => "secondary"
+                                        };
+
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="@payment.Auction?.ImgUrl"
+                                                         alt="@payment.Auction?.Name"
+                                                         class="rounded me-3"
+                                                         style="width: 50px; height: 50px; object-fit: cover;">
+                                                    <div>
+                                                        <div class="fw-bold">@payment.Auction?.Name</div>
+                                                        <small class="text-muted">ID: @payment.AuctionID</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="fw-bold text-success">@payment.Price.ToString("N0") ₫</span>
+                                            </td>
+                                            <td>
+                                                <div class="text-nowrap">
+                                                    <div>@payment.CreatedAt.ToString("HH:mm")</div>
+                                                    <small class="text-muted">@payment.CreatedAt.ToString("dd/MM/yyyy")</small>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="text-nowrap">
+                                                    <div>@payment.UpdatedAt.ToString("HH:mm")</div>
+                                                    <small class="text-muted">@payment.UpdatedAt.ToString("dd/MM/yyyy")</small>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-@statusClass">@statusText</span>
+                                            </td>
+                                            <td>
+                                                <a asp-controller="Auction" asp-action="Details" asp-route-id="@payment.AuctionID"
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-external-link-alt me-1"></i>Xem
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Summary -->
+                        <div class="row mt-4">
+                            <div class="col-md-4">
+                                <div class="card bg-primary text-white">
+                                    <div class="card-body text-center">
+                                        <h4>@Model.Count()</h4>
+                                        <small>Tổng thanh toán</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-success text-white">
+                                    <div class="card-body text-center">
+                                        <h4>@Model.Count(p => p.Status == PaymentStatus.Complete)</h4>
+                                        <small>Đã hoàn thành</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-warning text-white">
+                                    <div class="card-body text-center">
+                                        <h4>@Model.Sum(p => p.Price).ToString("N0") ₫</h4>
+                                        <small>Tổng giá trị</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#refreshBtn').click(function() {
+                location.reload();
+            });
+        });
+    </script>
+
+    <style>
+        .empty-state {
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            color: #6c757d;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+        }
+
+        .card .card {
+            border: none;
+            border-radius: 10px;
+        }
+    </style>
+}

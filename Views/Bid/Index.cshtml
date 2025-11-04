@@ -1,30 +1,188 @@
+@model IEnumerable<Bid>
 @{
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Quản Lý Đấu Giá";
+    // Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
-@model IEnumerable<MyApp.Models.Bid>
-<h2>Danh sách don hang</h2>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Sản phẩm</th>
-            <th>Người Đặt</th>
-            <th>Giá</th>
-            <th>Ngày tạo</th>
-            
-            
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var bid in Model)
-        {
-            <tr>
-                <td>@bid.Auction.Name</td>
-                <td>@bid.User.Name</td>
-                <td>@bid.Price</td>
-                <td>@bid.Time.ToString("HH:mm:ss dd/MM/yyyy")</td>
-            
-            </tr>
+<div class="container-fluid">
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="fas fa-gavel me-2"></i>
+            @ViewData["Title"]
+        </h1>
+        <p class="page-subtitle text-muted">Quản lý tất cả các lượt đấu giá trong hệ thống</p>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h5 class="card-title mb-0">Danh sách đấu giá</h5>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="refreshBtn">
+                            <i class="fas fa-sync-alt me-1"></i>Làm mới
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover" id="bidsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Phiên đấu giá</th>
+                            <th>Người đấu giá</th>
+                            <th>Giá đấu</th>
+                            <th>Thời gian</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var bid in Model.OrderByDescending(b => b.BidTime))
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="@bid.Auction?.ImgUrl"
+                                             alt="@bid.Auction?.Name"
+                                             class="rounded me-3"
+                                             style="width: 40px; height: 40px; object-fit: cover;">
+                                        <div>
+                                            <div class="fw-bold">@bid.Auction?.Name</div>
+                                            <small class="text-muted">ID: @bid.AuctionID</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold">@bid.User?.Name</div>
+                                    <small class="text-muted">@bid.User?.Email</small>
+                                </td>
+                                <td>
+                                    <span class="fw-bold text-success">@bid.Price.ToString("N0") ₫</span>
+                                </td>
+                                <td>
+                                    <div class="text-nowrap">
+                                        <div>@bid.BidTime.ToString("HH:mm")</div>
+                                        <small class="text-muted">@bid.BidTime.ToString("dd/MM/yyyy")</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    @if (bid.IsWinning)
+                                    {
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-trophy me-1"></i>Đang thắng
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-times me-1"></i>Đã thua
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a asp-controller="Auction" asp-action="Details" asp-route-id="@bid.AuctionID"
+                                           class="btn btn-outline-primary" title="Xem phiên đấu giá">
+                                            <i class="fas fa-external-link-alt"></i>
+                                        </a>
+                                        <button class="btn btn-outline-info view-bid-details"
+                                                data-bid-id="@bid.Id" title="Chi tiết">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (!Model.Any())
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-gavel fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Chưa có lượt đấu giá nào</h5>
+                    <p class="text-muted">Hiện tại không có lượt đấu giá nào trong hệ thống.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Bid Details -->
+<div class="modal fade" id="bidDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chi tiết lượt đấu giá</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="bidDetailsContent">
+                <!-- Content will be loaded via AJAX -->
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Refresh button
+            $('#refreshBtn').click(function() {
+                location.reload();
+            });
+
+            // View bid details
+            $('.view-bid-details').click(function() {
+                var bidId = $(this).data('bid-id');
+                $.get('@Url.Action("GetBidDetails", "Bid")', { id: bidId }, function(data) {
+                    $('#bidDetailsContent').html(data);
+                    $('#bidDetailsModal').modal('show');
+                });
+            });
+
+            // Auto-refresh every 30 seconds
+            setInterval(function() {
+                // You can implement partial refresh here if needed
+            }, 30000);
+        });
+    </script>
+
+    <style>
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            color: #6c757d;
         }
-    </tbody>
-</table>
+
+        .table td {
+            vertical-align: middle;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+        }
+
+        .btn-group-sm > .btn {
+            padding: 0.25rem 0.5rem;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+        }
+
+        .card-header {
+            border-bottom: 1px solid #e9ecef;
+            border-radius: 15px 15px 0 0 !important;
+        }
+    </style>
+}

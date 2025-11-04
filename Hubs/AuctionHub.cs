@@ -1,13 +1,25 @@
 using Microsoft.AspNetCore.SignalR;
-using System.Threading.Tasks;
 
-namespace MyApp.Hubs
+public class AuctionHub : Hub
 {
-    public class AuctionHub : Hub
+    public async Task JoinAuctionGroup(int auctionId)
     {
-        public async Task SendHighestBid(int auctionId, decimal price)
+        await Groups.AddToGroupAsync(Context.ConnectionId, auctionId.ToString());
+    }
+
+    public async Task LeaveAuctionGroup(int auctionId)
+    {
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, auctionId.ToString());
+    }
+
+    public async Task SendBid(int auctionId, decimal price, string userName)
+    {
+        await Clients.Group(auctionId.ToString()).SendAsync("ReceiveBid", new
         {
-            await Clients.All.SendAsync("ReceiveHighestBid", auctionId, price);
-        }
+            auctionId,
+            price,
+            userName,
+            time = DateTime.Now.ToString("HH:mm:ss")
+        });
     }
 }

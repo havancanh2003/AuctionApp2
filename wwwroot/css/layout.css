@@ -1,0 +1,177 @@
+﻿/* Biến màu chủ đạo */
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --accent-color: #e74c3c;
+    --success-color: #27ae60;
+    --warning-color: #f39c12;
+    --light-bg: #f8f9fa;
+    --dark-bg: #2c3e50;
+}
+
+/* Main header styling */
+.main-header {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+/* Dropdown menu styling */
+.dropdown-menu {
+    border: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border-radius: 8px;
+}
+
+.dropdown-item {
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+}
+
+    .dropdown-item:hover {
+        background-color: var(--secondary-color);
+        color: white;
+        transform: translateX(5px);
+    }
+
+/* Logout button in dropdown */
+.logout-btn {
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    color: #6c757d;
+}
+
+    .logout-btn:hover {
+        color: #dc3545;
+        background-color: transparent;
+    }
+
+/* Main content area */
+.main-content {
+    min-height: calc(100vh - 200px);
+    padding-top: 2rem;
+}
+
+/* Breadcrumb styling */
+.breadcrumb {
+    background-color: transparent;
+    padding: 0.75rem 1rem;
+    border-radius: 0.375rem;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "›";
+    color: #6c757d;
+}
+
+/* Footer styling */
+.main-footer {
+    margin-top: auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .navbar-nav .dropdown-menu {
+        border: none;
+        box-shadow: none;
+        background-color: transparent;
+    }
+
+    .dropdown-item {
+        padding-left: 2rem;
+    }
+
+    .main-content {
+        padding-top: 1rem;
+    }
+}
+
+/* Animation for nav items */
+.nav-link {
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+    .nav-link:hover {
+        color: var(--warning-color) !important;
+    }
+
+    .nav-link::after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: 0;
+        left: 50%;
+        background-color: var(--warning-color);
+        transition: all 0.3s ease;
+        transform: translateX(-50%);
+    }
+
+    .nav-link:hover::after {
+        width: 80%;
+    }
+
+/* Card styling for auction items */
+.auction-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+    .auction-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+/* Badge styling */
+.badge-auction {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.badge-live {
+    background-color: var(--success-color);
+    color: white;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Button styling */
+.btn-primary {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+
+    .btn-primary:hover {
+        background-color: #2980b9;
+        border-color: #2980b9;
+    }
+
+.btn-danger {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+    .btn-danger:hover {
+        background-color: #c0392b;
+        border-color: #c0392b;
+    }

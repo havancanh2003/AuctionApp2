@@ -1,62 +1,503 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Trang Chủ - Đấu Giá Trực Tuyến";
 }
 
-<div class="text-center">
-    <div class="row pt-4 pb-4">
-        <div class="col-md-6">
-            <img src="https://i.pinimg.com/736x/94/36/48/9436485e54871f130c1a90920d3f7f37.jpg" alt="auction image" class="img-fluid" >
+<div class="homepage-container">
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center min-vh-80">
+                <div class="col-lg-6">
+                    <h1 class="hero-title">
+                        Chào mừng đến với
+                        <span class="text-primary">Đấu Giá Trực Tuyến</span>
+                    </h1>
+                    <p class="hero-description">
+                        Khám phá thế giới đấu giá đầy thú vị - Nơi bạn có thể sở hữu những món đồ độc đáo
+                        với mức giá tốt nhất. Tham gia ngay để trải nghiệm không gian đấu giá chuyên nghiệp
+                        và minh bạch.
+                    </p>
+                    <div class="hero-buttons">
+                        <a asp-controller="Auction" asp-action="ActiveAuctions" class="btn btn-primary btn-lg me-3">
+                            <i class="fas fa-bolt me-2"></i>Đấu Giá Ngay
+                        </a>
+                        <a asp-controller="Auction" asp-action="ApprovedAuctions" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-calendar-alt me-2"></i>Lịch Đấu Giá
+                        </a>
+                    </div>
+                    <div class="hero-stats mt-4">
+                        <div class="row">
+                            <div class="col-4">
+                                <div class="stat-item">
+                                    <h4 class="stat-number">500+</h4>
+                                    <p class="stat-label">Phiên đấu giá</p>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-item">
+                                    <h4 class="stat-number">2,000+</h4>
+                                    <p class="stat-label">Người dùng</p>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-item">
+                                    <h4 class="stat-number">98%</h4>
+                                    <p class="stat-label">Hài lòng</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero-image">
+                        <img src="https://i.pinimg.com/736x/94/36/48/9436485e54871f130c1a90920d3f7f37.jpg"
+                             alt="Đấu giá trực tuyến" class="img-fluid rounded-3 shadow">
+                        <div class="floating-badge">
+                            <i class="fas fa-gavel"></i>
+                            <span>Live Auction</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-md-6">
-            <h4> <strong> Chào mừng đến với Đấu giá trực tuyến</strong></h4>
-            <br /> 
-            <p>Trang web đấu giá trực tuyến của chúng tôi cung cấp một nền tảng tiện lợi và an toàn để người dùng có thể tham gia vào các phiên đấu giá từ khắp nơi trên thế giới. Với giao diện thân thiện và dễ sử dụng, người dùng có thể dễ dàng duyệt qua các mặt hàng đa dạng, từ đồ cổ, nghệ thuật đến đồ điện tử và nhiều hơn nữa.</p>
-            <p>Chúng tôi cam kết mang đến trải nghiệm đấu giá tốt nhất với các tính năng như thông báo thời gian thực, hệ thống đặt giá tự động và hỗ trợ khách hàng tận tâm. Tham gia ngay hôm nay để khám phá những cơ hội tuyệt vời và sở hữu những món đồ độc đáo với giá cả hợp lý!</p>    
-            
-            <a asp-controller="Auction" asp-action="ActiveAuctions" class="btn btn-outline-secondary w-100 mt-2">
-                Trải nghiệm thử
-            </a>
+    </section>
 
-        </div>
-    </div>
-    <hr style="border: none; height: 2px; background-color: black;">
-    <h3> Nguyên tắc vàng trong đấu giá</h3>
-    <div class="row pt-4 pb-4">
-        <div class="col-md-4">
-            <h5><strong>1. Nghiên cứu kỹ lưỡng</strong></h5>
-            <p>Trước khi tham gia đấu giá, hãy tìm hiểu về mặt hàng bạn quan tâm, giá trị thị trường và lịch sử đấu giá để đưa ra quyết định thông minh.</p>
-        </div>
-        <div class="col-md-4">
-            <h5><strong>2. Đặt ngân sách</strong></h5>
-            <p>Xác định mức giá tối đa bạn sẵn sàng trả và tuân thủ nó để tránh việc chi tiêu quá mức trong cơn hứng thú đấu giá.</p>
-        </div>
-        <div class="col-md-4">
-            <h5><strong>3. Theo dõi thời gian</strong></h5>
-            <p>Chú ý đến thời gian kết thúc của phiên đấu giá để không bỏ lỡ cơ hội đặt giá cuối cùng.</p>
-        </div>
-    </div>
-    <div class="row pt-4 pb-4">
-        <div class="col-md-4">
-            <h5><strong>4. Đặt giá chiến lược</strong></h5>
-            <p>Thay vì đặt giá ngay từ đầu, hãy quan sát các đối thủ và đặt giá vào những phút cuối để tăng cơ hội thắng cuộc.</p>
-        </div>
-        <div class="col-md-4">
-            <h5><strong>5. Giữ bình tĩnh</strong></h5>
-            <p>Đừng để cảm xúc chi phối quyết định của bạn. Hãy giữ bình tĩnh và tuân thủ kế hoạch đã đề ra.</p>
-        </div>
-        <div class="col-md-4">
-            <h5><strong>6. Kiểm tra điều khoản và điều kiện</strong></h5>
-            <p>Đảm bảo bạn hiểu rõ các quy định của phiên đấu giá, bao gồm phí dịch vụ, chính sách hoàn trả và các yêu cầu khác.</p>
-        </div>
-    </div>
-     <img src="https://i.pinimg.com/1200x/15/46/57/154657e5b8393753a45bdd2f307b2598.jpg" alt="" style="max-width:100%; height:auto;">
-    <hr style="border: none; height: 2px; background-color: black;">
-    <h3>Về chúng tôi</h3>
-    <div>
-        <p>Chúng tôi là một nhóm đam mê công nghệ và thương mại điện tử, với mục tiêu tạo ra một nền tảng đấu giá trực tuyến an toàn, tiện lợi và hấp dẫn cho người dùng trên toàn thế giới. Với nhiều năm kinh nghiệm trong lĩnh vực phát triển web và quản lý dự án, chúng tôi cam kết mang đến trải nghiệm người dùng tốt nhất thông qua giao diện thân thiện, tính năng đa dạng và dịch vụ hỗ trợ khách hàng tận tâm.</p>
-        <p>Chúng tôi tin rằng đấu giá trực tuyến không chỉ là một hình thức mua sắm mà còn là một trải nghiệm thú vị, nơi người dùng có thể khám phá những món đồ độc đáo và quý hiếm. Hãy cùng chúng tôi xây dựng cộng đồng đấu giá trực tuyến ngày càng phát triển và thịnh vượng!</p>
-        <p>僕はカードゲームのデッキ構築している感覚ですね</p>
-        <p>環境デッキ、特化デッキ、格安デッキ・・・みたいな</p>
-    </div>
+    <!-- Principles Section -->
+    <section class="principles-section py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Nguyên Tắc Vàng Trong Đấu Giá</h2>
+                <p class="section-subtitle">Những bí quyết giúp bạn trở thành người đấu giá thông minh</p>
+            </div>
 
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4">
+                    <div class="principle-card">
+                        <div class="principle-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h5 class="principle-title">Nghiên Cứu Kỹ Lưỡng</h5>
+                        <p class="principle-description">
+                            Tìm hiểu về mặt hàng, giá trị thị trường và lịch sử đấu giá để đưa ra quyết định thông minh.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="principle-card">
+                        <div class="principle-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h5 class="principle-title">Đặt Ngân Sách</h5>
+                        <p class="principle-description">
+                            Xác định mức giá tối đa và tuân thủ nghiêm ngặt để tránh chi tiêu quá mức.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="principle-card">
+                        <div class="principle-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h5 class="principle-title">Theo Dõi Thời Gian</h5>
+                        <p class="principle-description">
+                            Chú ý thời gian kết thúc để không bỏ lỡ cơ hội đặt giá cuối cùng quan trọng.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="principle-card">
+                        <div class="principle-icon">
+                            <i class="fas fa-chess-knight"></i>
+                        </div>
+                        <h5 class="principle-title">Chiến Lược Đặt Giá</h5>
+                        <p class="principle-description">
+                            Quan sát đối thủ và đặt giá vào phút cuối để tăng cơ hội chiến thắng.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="principle-card">
+                        <div class="principle-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h5 class="principle-title">Giữ Bình Tĩnh</h5>
+                        <p class="principle-description">
+                            Đừng để cảm xúc chi phối. Luôn giữ cái đầu lạnh và tuân thủ kế hoạch.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="principle-card">
+                        <div class="principle-icon">
+                            <i class="fas fa-file-contract"></i>
+                        </div>
+                        <h5 class="principle-title">Điều Khoản Rõ Ràng</h5>
+                        <p class="principle-description">
+                            Hiểu rõ quy định về phí dịch vụ, chính sách hoàn trả và các điều kiện khác.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="feature-image-container">
+                        <img src="https://i.pinimg.com/1200x/15/46/57/154657e5b8393753a45bdd2f307b2598.jpg"
+                             alt="Tính năng đấu giá" class="img-fluid rounded-3 shadow">
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="features-content">
+                        <h2 class="section-title">Tại Sao Chọn Chúng Tôi?</h2>
+
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="feature-text">
+                                <h5>An Toàn & Bảo Mật</h5>
+                                <p>Hệ thống bảo mật đa lớp, đảm bảo thông tin và giao dịch của bạn luôn an toàn.</p>
+                            </div>
+                        </div>
+
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div class="feature-text">
+                                <h5>Đấu Giá Thời Gian Thực</h5>
+                                <p>Cập nhật giá tức thì, thông báo ngay lập tức khi có người đấu giá cao hơn.</p>
+                            </div>
+                        </div>
+
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-headset"></i>
+                            </div>
+                            <div class="feature-text">
+                                <h5>Hỗ Trợ 24/7</h5>
+                                <p>Đội ngũ hỗ trợ luôn sẵn sàng giải đáp mọi thắc mắc của bạn mọi lúc.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section py-5 bg-dark text-light">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h2 class="section-title text-light">Về Chúng Tôi</h2>
+                    <p class="lead">
+                        Chúng tôi là một nhóm đam mê công nghệ và thương mại điện tử, với sứ mệnh tạo ra
+                        nền tảng đấu giá trực tuyến an toàn, tiện lợi và hấp dẫn cho người dùng Việt Nam.
+                    </p>
+                    <p>
+                        Với nhiều năm kinh nghiệm trong lĩnh vực phát triển web và quản lý dự án, chúng tôi
+                        cam kết mang đến trải nghiệm người dùng tốt nhất thông qua giao diện thân thiện,
+                        tính năng đa dạng và dịch vụ hỗ trợ khách hàng tận tâm.
+                    </p>
+                    <div class="team-members mt-4">
+                        <span class="badge bg-primary me-2">Phạm Đức Anh</span>
+                        <span class="badge bg-primary me-2">Bảo Nguyên</span>
+                        <span class="badge bg-primary">Hà Văn Cảnh</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section py-5 bg-primary text-light">
+        <div class="container text-center">
+            <h2 class="cta-title">Sẵn Sàng Tham Gia Đấu Giá?</h2>
+            <p class="cta-description mb-4">
+                Đăng ký tài khoản ngay hôm nay và khám phá thế giới đấu giá đầy thú vị
+            </p>
+            <div class="cta-buttons">
+                <a asp-controller="Account" asp-action="Register" class="btn btn-light btn-lg me-3">
+                    <i class="fas fa-user-plus me-2"></i>Đăng Ký Ngay
+                </a>
+                <a asp-controller="Auction" asp-action="ActiveAuctions" class="btn btn-outline-light btn-lg">
+                    <i class="fas fa-eye me-2"></i>Xem Phiên Đấu Giá
+                </a>
+            </div>
+        </div>
+    </section>
 </div>
+
+@section Styles {
+    <style>
+        .homepage-container {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 80px 0;
+        }
+
+        .min-vh-80 {
+            min-height: 80vh;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .hero-description {
+            font-size: 1.2rem;
+            color: #6c757d;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .hero-buttons .btn {
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .hero-stats {
+            border-top: 1px solid #dee2e6;
+            padding-top: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .hero-image {
+            position: relative;
+        }
+
+        .floating-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #e74c3c;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 25px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        /* Principles Section */
+        .principles-section {
+            background: #f8f9fa;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: #6c757d;
+            margin-bottom: 3rem;
+        }
+
+        .principle-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            height: 100%;
+            border: 1px solid #e9ecef;
+        }
+
+            .principle-card:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+            }
+
+        .principle-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+
+            .principle-icon i {
+                font-size: 2rem;
+                color: white;
+            }
+
+        .principle-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        .principle-description {
+            color: #6c757d;
+            line-height: 1.6;
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 80px 0;
+        }
+
+        .feature-image-container {
+            position: relative;
+        }
+
+        .features-content {
+            padding-left: 2rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+            .feature-item:hover {
+                background: #f8f9fa;
+                transform: translateX(10px);
+            }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: #3498db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1.5rem;
+            flex-shrink: 0;
+        }
+
+            .feature-icon i {
+                font-size: 1.5rem;
+                color: white;
+            }
+
+        .feature-text h5 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+
+        .feature-text p {
+            color: #6c757d;
+            margin: 0;
+        }
+
+        /* About Section */
+        .about-section {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+        }
+
+        .cta-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .cta-description {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* Animations */
+        @@keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-buttons .btn {
+                display: block;
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+
+                .hero-buttons .btn:last-child {
+                    margin-bottom: 0;
+                }
+
+            .features-content {
+                padding-left: 0;
+                margin-top: 2rem;
+            }
+
+            .feature-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .feature-icon {
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+}

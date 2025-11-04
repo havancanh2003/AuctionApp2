@@ -1,66 +1,389 @@
+@model IEnumerable<Payment>
 @{
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Quản Lý Thanh Toán";
+    // Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
-@model IEnumerable<MyApp.Models.Payment>
-<h2>Danh sách don hang</h2>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Sản phẩm</th>
-            <th>Người thắng</th>
-            <th>Giá</th>
-            <th>Ngày tạo</th>
-            <th>Trạng thái</th>
-            
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var payment in Model)
-        {
-            <tr>
-                <td>@payment.Auction.Name</td>
-                <td>@payment.User.Name</td>
-                <td>@payment.Price</td>
-                <td>@payment.CreatedAt.ToString("HH:mm:ss dd/MM/yyyy")</td>
-                <td>
-                    <select class="form-control status-dropdown" data-id="@payment.Id" data-status="@((int)payment.Status)">
-                        @foreach (PaymentStatus status in Enum.GetValues(typeof(PaymentStatus)))
-                        {
-                            <option value="@((int)status)" selected="@(payment.Status == status)">
-                                @status.ToString()
-                            </option>
-                        }
-                    </select>
-                </td>
+<div class="container-fluid">
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="fas fa-credit-card me-2"></i>
+            @ViewData["Title"]
+        </h1>
+        <p class="page-subtitle text-muted">Quản lý tất cả giao dịch thanh toán trong hệ thống</p>
+    </div>
 
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Tổng thanh toán
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalPayments">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-receipt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Chưa thanh toán
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="unpaidPayments">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Đang xử lý
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="inTransitPayments">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-sync-alt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Hoàn thành
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="completePayments">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            </tr>
-        }
-    </tbody>
-</table>
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h5 class="card-title mb-0">Danh sách thanh toán</h5>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="refreshBtn">
+                            <i class="fas fa-sync-alt me-1"></i>Làm mới
+                        </button>
+                        <button type="button" class="btn btn-outline-success btn-sm" id="exportBtn">
+                            <i class="fas fa-download me-1"></i>Xuất Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            @if (!Model.Any())
+            {
+                <div class="empty-state text-center py-5">
+                    <i class="fas fa-credit-card fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">Chưa có thanh toán nào</h4>
+                    <p class="text-muted">Hiện tại không có giao dịch thanh toán nào trong hệ thống.</p>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover" id="paymentsTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Phiên đấu giá</th>
+                                <th>Người mua</th>
+                                <th>Số tiền</th>
+                                <th>Ngày tạo</th>
+                                <th>Cập nhật</th>
+                                <th>Trạng thái</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var payment in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="@payment.Auction?.ImgUrl"
+                                                 alt="@payment.Auction?.Name"
+                                                 class="rounded me-3"
+                                                 style="width: 40px; height: 40px; object-fit: cover;">
+                                            <div>
+                                                <div class="fw-bold">@payment.Auction?.Name</div>
+                                                <small class="text-muted">ID: @payment.AuctionID</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-semibold">@payment.User?.Name</div>
+                                        <small class="text-muted">@payment.User?.Email</small>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold text-success">@payment.Price.ToString("N0") ₫</span>
+                                    </td>
+                                    <td>
+                                        <div class="text-nowrap">
+                                            <div>@payment.CreatedAt.ToString("HH:mm")</div>
+                                            <small class="text-muted">@payment.CreatedAt.ToString("dd/MM/yyyy")</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="text-nowrap">
+                                            <div>@payment.UpdatedAt.ToString("HH:mm")</div>
+                                            <small class="text-muted">@payment.UpdatedAt.ToString("dd/MM/yyyy")</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <select class="form-select form-select-sm status-dropdown"
+                                                data-payment-id="@payment.Id"
+                                                data-current-status="@((int)payment.Status)">
+                                            @foreach (PaymentStatus status in Enum.GetValues(typeof(PaymentStatus)))
+                                            {
+                                                var statusText = status switch
+                                                {
+                                                    PaymentStatus.Unpaid => "Chưa thanh toán",
+                                                    PaymentStatus.InTransit => "Đang xử lý",
+                                                    PaymentStatus.Complete => "Hoàn thành",
+                                                    _ => status.ToString()
+                                                };
+
+                                                var isSelected = payment.Status == status;
+                                                <option value="@((int)status)" selected="@isSelected">
+                                                    @statusText
+                                                </option>
+                                            }
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-info view-payment-details"
+                                                    data-payment-id="@payment.Id"
+                                                    title="Chi tiết">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <a asp-controller="Auction" asp-action="Details" asp-route-id="@payment.AuctionID"
+                                               class="btn btn-outline-primary" title="Xem phiên đấu giá">
+                                                <i class="fas fa-external-link-alt"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container for Notifications -->
+<div class="toast-container position-fixed top-0 end-0 p-3">
+    <div id="successToast" class="toast" role="alert">
+        <div class="toast-header bg-success text-white">
+            <i class="fas fa-check-circle me-2"></i>
+            <strong class="me-auto">Thành công</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="successToastMessage"></div>
+    </div>
+    <div id="errorToast" class="toast" role="alert">
+        <div class="toast-header bg-danger text-white">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <strong class="me-auto">Lỗi</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="errorToastMessage"></div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
-        $(document).ready(function () {
-            $('.status-dropdown').change(function () {
-                var paymentId = $(this).data('id');
-                var newStatus = $(this).val();
+        $(document).ready(function() {
+            // Load statistics
+            loadPaymentStatistics();
 
-                $.ajax({
-                    url: '@Url.Action("UpdatePaymentStatus", "Payment")',
-                    type: 'POST',
-                    data: {
-                        paymentId: paymentId,
-                        newStatus: newStatus
-                    },
-                    success: function () {
-                        alert('Trạng thái đã được cập nhật thành công.');
-                    },
-                    error: function () {
-                        alert('Đã xảy ra lỗi khi cập nhật trạng thái.');
-                    }
-                });
+            // Refresh button
+            $('#refreshBtn').click(function() {
+                location.reload();
             });
+
+            // Export button
+            $('#exportBtn').click(function() {
+                alert('Tính năng xuất Excel sẽ được triển khai sau!');
+            });
+
+            // Status dropdown change
+            $('.status-dropdown').change(function() {
+                var paymentId = $(this).data('payment-id');
+                var newStatus = $(this).val();
+                var currentStatus = $(this).data('current-status');
+
+                if (newStatus == currentStatus) {
+                    return;
+                }
+
+                updatePaymentStatus(paymentId, newStatus, $(this));
+            });
+
+            // View payment details
+            $('.view-payment-details').click(function() {
+                var paymentId = $(this).data('payment-id');
+                // Implement payment details modal
+                alert('Chi tiết thanh toán ID: ' + paymentId);
+            });
+
+            // Auto-refresh statistics every 60 seconds
+            setInterval(loadPaymentStatistics, 60000);
         });
+
+        function loadPaymentStatistics() {
+            $.get('@Url.Action("GetPaymentStatistics", "Payment")', function(data) {
+                if (!data.error) {
+                    $('#totalPayments').text(data.total);
+                    $('#unpaidPayments').text(data.unpaid);
+                    $('#inTransitPayments').text(data.inTransit);
+                    $('#completePayments').text(data.complete);
+                }
+            });
+        }
+
+        function updatePaymentStatus(paymentId, newStatus, dropdown) {
+            $.ajax({
+                url: '@Url.Action("UpdatePaymentStatus", "Payment")',
+                type: 'POST',
+                data: {
+                    paymentId: paymentId,
+                    newStatus: newStatus
+                },
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Update current status
+                        dropdown.data('current-status', newStatus);
+
+                        // Update dropdown text with new status class
+                        var statusClass = response.statusClass;
+                        dropdown.removeClass('border-warning border-info border-success');
+                        dropdown.addClass('border-' + statusClass);
+
+                        showToast('success', response.message);
+                    } else {
+                        showToast('error', response.message);
+                        // Revert dropdown to previous value
+                        dropdown.val(dropdown.data('current-status'));
+                    }
+                },
+                error: function() {
+                    showToast('error', 'Đã xảy ra lỗi khi cập nhật trạng thái.');
+                    // Revert dropdown to previous value
+                    dropdown.val(dropdown.data('current-status'));
+                }
+            });
+        }
+
+        function showToast(type, message) {
+            var toastElement = type === 'success' ? $('#successToast') : $('#errorToast');
+            var toastMessage = type === 'success' ? $('#successToastMessage') : $('#errorToastMessage');
+
+            toastMessage.text(message);
+            var toast = new bootstrap.Toast(toastElement[0]);
+            toast.show();
+        }
     </script>
+
+    <style>
+        .page-header {
+            border-bottom: 2px solid #f8f9fa;
+            padding-bottom: 1rem;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+        }
+
+        .card-header {
+            border-bottom: 1px solid #e9ecef;
+            border-radius: 15px 15px 0 0 !important;
+        }
+
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            color: #6c757d;
+        }
+
+        .table td {
+            vertical-align: middle;
+        }
+
+        .status-dropdown {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+            .status-dropdown:focus {
+                box-shadow: none;
+            }
+
+        .border-left-primary {
+            border-left: 4px solid #4e73df !important;
+        }
+
+        .border-left-warning {
+            border-left: 4px solid #f6c23e !important;
+        }
+
+        .border-left-info {
+            border-left: 4px solid #36b9cc !important;
+        }
+
+        .border-left-success {
+            border-left: 4px solid #1cc88a !important;
+        }
+
+        .empty-state {
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .btn-group-sm > .btn {
+            padding: 0.25rem 0.5rem;
+        }
+    </style>
 }

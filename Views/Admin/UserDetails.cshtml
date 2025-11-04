@@ -1,0 +1,488 @@
+﻿@using MyApp.Dtos
+@model MyApp.Dtos.UserDetailViewModel
+@{
+    ViewData["Title"] = "Chi Tiết Người Dùng";
+    // Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="page-title">
+                    <i class="fas fa-user me-2"></i>
+                    Chi Tiết Người Dùng
+                </h1>
+                <p class="page-subtitle text-muted">Thông tin chi tiết về người dùng</p>
+            </div>
+            <a asp-action="UserManagement" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Quay lại
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- User Information -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Thông Tin Cá Nhân</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-2">
+                            <div class="avatar-circle bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto"
+                                 style="width: 80px; height: 80px; font-size: 2rem;">
+                                @Model.Name.Substring(0, 1).ToUpper()
+                            </div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label fw-bold text-muted">Họ và tên</label>
+                                        <p class="fs-5 mb-1">@Model.Name</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label fw-bold text-muted">Email</label>
+                                        <p class="fs-5 mb-1">@Model.Email</p>
+                                        @if (!Model.EmailConfirmed)
+                                        {
+                                            <small class="text-warning">
+                                                <i class="fas fa-exclamation-triangle me-1"></i>Chưa xác thực email
+                                            </small>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-bold text-muted">Số điện thoại</label>
+                                <p class="fs-6">@(Model.Phone ?? "Chưa cập nhật")</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-bold text-muted">Địa chỉ</label>
+                                <p class="fs-6">@(Model.Address ?? "Chưa cập nhật")</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-bold text-muted">Vai trò</label>
+                                <div>
+                                    <span class="badge bg-primary fs-6">@Model.RoleName</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-bold text-muted">Trạng thái</label>
+                                <div>
+                                    <span class="badge @(Model.IsActived ? "bg-success" : "bg-danger") fs-6">
+                                        @(Model.IsActived ? "Đang hoạt động" : "Đã khóa")
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-bold text-muted">Ngày tạo</label>
+                                <p class="fs-6">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-bold text-muted">Đăng nhập cuối</label>
+                                <p class="fs-6">
+                                    @if (Model.LastLoginDate.HasValue)
+                                    {
+                                        @Model.LastLoginDate.Value.ToString("dd/MM/yyyy HH:mm")
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Chưa đăng nhập</span>
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Activity -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Hoạt Động Gần Đây</h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center py-4">
+                        <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">Tính năng đang phát triển</h5>
+                        <p class="text-muted">Lịch sử hoạt động chi tiết sẽ được cập nhật trong phiên bản tiếp theo.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Stats & Actions -->
+        <div class="col-xl-4 col-lg-5">
+            <!-- User Stats -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Thống Kê</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <div class="border rounded p-3 bg-light">
+                                <div class="h4 text-primary mb-1">@Model.TotalAuctions</div>
+                                <div class="small text-muted">Phiên đấu giá</div>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="border rounded p-3 bg-light">
+                                <div class="h4 text-success mb-1">@Model.TotalBids</div>
+                                <div class="small text-muted">Lượt đấu giá</div>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="border rounded p-3 bg-light">
+                                <div class="h4 text-info mb-1">@(Model.IsActived ? "Đang hoạt động" : "Đã khóa")</div>
+                                <div class="small text-muted">Trạng thái</div>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="border rounded p-3 bg-light">
+                                <div class="h4 text-warning mb-1">@Model.RoleName</div>
+                                <div class="small text-muted">Vai trò</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Thao Tác Nhanh</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn @(Model.IsActived ? "btn-warning" : "btn-success")"
+                                id="toggleStatusBtn"
+                                data-user-id="@Model.Id">
+                            <i class="fas @(Model.IsActived ? "fa-lock" : "fa-unlock") me-2"></i>
+                            @(Model.IsActived ? "Khóa Tài Khoản" : "Kích Hoạt Tài Khoản")
+                        </button>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Thay đổi vai trò</label>
+                            <select class="form-select" id="roleChangeSelect">
+                                <option value="">-- Chọn vai trò mới --</option>
+                                @foreach (RoleTypeEnum role in Enum.GetValues(typeof(RoleTypeEnum)))
+                                {
+                                    <option value="@((int)role)" selected="@(Model.Role == (int)role)">
+                                        @GetRoleDisplayName(role)
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <button class="btn btn-outline-danger" id="deleteUserBtn" data-user-id="@Model.Id" data-user-name="@Model.Name">
+                            <i class="fas fa-trash me-2"></i>Xóa Người Dùng
+                        </button>
+
+                        <button class="btn btn-outline-info" id="sendMessageBtn" data-user-email="@Model.Email">
+                            <i class="fas fa-envelope me-2"></i>Gửi Tin Nhắn
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Xác Nhận</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modalMessage">
+                <!-- Message will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="confirmAction">Xác Nhận</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Send Message Modal -->
+<div class="modal fade" id="messageModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Gửi Tin Nhắn</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Người nhận</label>
+                    <input type="text" class="form-control" id="messageRecipient" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Tiêu đề</label>
+                    <input type="text" class="form-control" id="messageSubject" placeholder="Nhập tiêu đề tin nhắn...">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Nội dung</label>
+                    <textarea class="form-control" id="messageContent" rows="5" placeholder="Nhập nội dung tin nhắn..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="sendMessageConfirm">Gửi Tin Nhắn</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Toggle user status
+            $('#toggleStatusBtn').click(function() {
+                var userId = $(this).data('user-id');
+                var isActive = @Json.Serialize(Model.IsActived);
+
+                $('#modalTitle').text(isActive ? 'Khóa Tài Khoản' : 'Kích Hoạt Tài Khoản');
+                $('#modalMessage').text(isActive
+                    ? 'Bạn có chắc muốn khóa tài khoản này? Người dùng sẽ không thể đăng nhập.'
+                    : 'Bạn có chắc muốn kích hoạt tài khoản này?'
+                );
+
+                $('#confirmAction').off('click').on('click', function() {
+                    $.ajax({
+                        url: '@Url.Action("ToggleUserStatus", "Admin")',
+                        type: 'POST',
+                        data: { id: userId },
+                        headers: {
+                            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                showToast('success', response.message);
+                                $('#confirmationModal').modal('hide');
+                                // Update button and status display
+                                var btn = $('#toggleStatusBtn');
+                                var statusBadge = $('.badge.fs-6');
+                                if (response.isActive) {
+                                    btn.removeClass('btn-success').addClass('btn-warning');
+                                    btn.html('<i class="fas fa-lock me-2"></i>Khóa Tài Khoản');
+                                    statusBadge.removeClass('bg-danger').addClass('bg-success').text('Đang hoạt động');
+                                } else {
+                                    btn.removeClass('btn-warning').addClass('btn-success');
+                                    btn.html('<i class="fas fa-unlock me-2"></i>Kích Hoạt Tài Khoản');
+                                    statusBadge.removeClass('bg-success').addClass('bg-danger').text('Đã khóa');
+                                }
+                            } else {
+                                showToast('error', response.message);
+                                $('#confirmationModal').modal('hide');
+                            }
+                        },
+                        error: function() {
+                            showToast('error', 'Đã xảy ra lỗi khi cập nhật trạng thái.');
+                            $('#confirmationModal').modal('hide');
+                        }
+                    });
+                });
+
+                $('#confirmationModal').modal('show');
+            });
+
+            // Change role
+            $('#roleChangeSelect').change(function() {
+                var newRole = $(this).val();
+                if (!newRole) return;
+
+                var userId = @Model.Id;
+                var currentRole = @Model.Role;
+
+                if (newRole == currentRole) {
+                    $(this).val('');
+                    return;
+                }
+
+                $('#modalTitle').text('Thay Đổi Vai Trò');
+                $('#modalMessage').text(`Bạn có chắc muốn thay đổi vai trò của người dùng này?`);
+
+                $('#confirmAction').off('click').on('click', function() {
+                    $.ajax({
+                        url: '@Url.Action("UpdateUserRole", "Admin")',
+                        type: 'POST',
+                        data: {
+                            id: userId,
+                            newRole: newRole
+                        },
+                        headers: {
+                            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                showToast('success', response.message);
+                                $('#confirmationModal').modal('hide');
+                                // Update role display
+                                $('.badge.bg-primary.fs-6').text(response.roleName);
+                                $('#roleChangeSelect').val('');
+                            } else {
+                                showToast('error', response.message);
+                                $('#confirmationModal').modal('hide');
+                            }
+                        },
+                        error: function() {
+                            showToast('error', 'Đã xảy ra lỗi khi cập nhật vai trò.');
+                            $('#confirmationModal').modal('hide');
+                        }
+                    });
+                });
+
+                $('#confirmationModal').modal('show');
+            });
+
+            // Delete user
+            $('#deleteUserBtn').click(function() {
+                var userId = $(this).data('user-id');
+                var userName = $(this).data('user-name');
+
+                $('#modalTitle').text('Xóa Người Dùng');
+                $('#modalMessage').text(`Bạn có chắc muốn xóa vĩnh viễn người dùng "${userName}"? Hành động này không thể hoàn tác.`);
+
+                $('#confirmAction').off('click').on('click', function() {
+                    $.ajax({
+                        url: '@Url.Action("DeleteUser", "Admin")',
+                        type: 'POST',
+                        data: { id: userId },
+                        headers: {
+                            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                showToast('success', response.message);
+                                $('#confirmationModal').modal('hide');
+                                setTimeout(() => window.location.href = '@Url.Action("UserManagement")', 1500);
+                            } else {
+                                showToast('error', response.message);
+                                $('#confirmationModal').modal('hide');
+                            }
+                        },
+                        error: function() {
+                            showToast('error', 'Đã xảy ra lỗi khi xóa người dùng.');
+                            $('#confirmationModal').modal('hide');
+                        }
+                    });
+                });
+
+                $('#confirmationModal').modal('show');
+            });
+
+            // Send message
+            $('#sendMessageBtn').click(function() {
+                var userEmail = $(this).data('user-email');
+                $('#messageRecipient').val(userEmail);
+                $('#messageModal').modal('show');
+            });
+
+            $('#sendMessageConfirm').click(function() {
+                var subject = $('#messageSubject').val();
+                var content = $('#messageContent').val();
+
+                if (!subject || !content) {
+                    showToast('error', 'Vui lòng nhập đầy đủ tiêu đề và nội dung tin nhắn.');
+                    return;
+                }
+
+                // Simulate sending message (you'll need to implement this in your controller)
+                showToast('success', 'Tin nhắn đã được gửi thành công!');
+                $('#messageModal').modal('hide');
+
+                // Clear form
+                $('#messageSubject').val('');
+                $('#messageContent').val('');
+            });
+
+            // Toast notification function
+            function showToast(type, message) {
+                var toast = `<div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0" role="alert">
+                                <div class="d-flex">
+                                    <div class="toast-body">${message}</div>
+                                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                                </div>
+                             </div>`;
+                $('.toast-container').append(toast);
+                $('.toast').last().toast('show');
+                setTimeout(() => {
+                    $('.toast').last().toast('hide');
+                    setTimeout(() => $('.toast').last().remove(), 500);
+                }, 5000);
+            }
+        });
+    </script>
+
+    <style>
+        .avatar-circle {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-control-static {
+            padding: 0.375rem 0;
+            margin-bottom: 0;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #212529;
+            background-color: transparent;
+            border: solid transparent;
+            border-width: 1px 0;
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1055;
+        }
+    </style>
+}
+
+@functions {
+    public string GetRoleDisplayName(RoleTypeEnum role)
+    {
+        return role switch
+        {
+            RoleTypeEnum.Admin => "Quản trị viên",
+            RoleTypeEnum.Customer => "Người mua",
+            RoleTypeEnum.Seller => "Người bán",
+            _ => role.ToString()
+        };
+    }
+}

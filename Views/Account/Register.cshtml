@@ -1,45 +1,137 @@
-﻿@model MyApp.Dtos.RegisterViewModel
+﻿@using MyApp.Dtos
+@model MyApp.Dtos.RegisterViewModel
 @{
-    ViewData["Title"] = "Đăng ký";
+    ViewData["Title"] = "Đăng Ký";
     Layout = "~/Views/Shared/_AuthLayout.cshtml";
 }
+<div class="auth-content">
+    @if (ViewData.ModelState.ErrorCount > 0)
+    {
+        <div class="validation-summary-errors">
+            <div asp-validation-summary="All" class="text-danger"></div>
+        </div>
+    }
 
-<h2 class="auth-title" style="color:var(--success)">Tạo tài khoản mới</h2>
+    <form asp-action="Register" method="post" id="registerForm">
+        <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
 
-<form asp-action="Register" method="post">
-    <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="Name" class="form-label">
+                <i class="fas fa-user me-2"></i>Họ và tên
+            </label>
+            <input asp-for="Name" class="form-control" placeholder="Nhập họ tên đầy đủ..." />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
 
-    <label asp-for="Name"></label>
-    <input asp-for="Name" placeholder="Nhập họ tên..." />
-    <span asp-validation-for="Name" class="text-danger"></span>
+        <div class="form-group">
+            <label asp-for="Email" class="form-label">
+                <i class="fas fa-envelope me-2"></i>Email
+            </label>
+            <input asp-for="Email" class="form-control" placeholder="Nhập email của bạn..." />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
 
-    <label asp-for="Email"></label>
-    <input asp-for="Email" placeholder="Nhập email..." />
-    <span asp-validation-for="Email" class="text-danger"></span>
+        <div class="form-group">
+            <label asp-for="Phone" class="form-label">
+                <i class="fas fa-phone me-2"></i>Số điện thoại
+            </label>
+            <input asp-for="Phone" class="form-control" placeholder="Nhập số điện thoại..." />
+            <span asp-validation-for="Phone" class="text-danger"></span>
+        </div>
 
-    <label asp-for="Password"></label>
-    <input asp-for="Password" placeholder="Nhập mật khẩu..." />
-    <span asp-validation-for="Password" class="text-danger"></span>
+        <div class="form-group">
+            <label asp-for="Address" class="form-label">
+                <i class="fas fa-map-marker-alt me-2"></i>Địa chỉ
+            </label>
+            <input asp-for="Address" class="form-control" placeholder="Nhập địa chỉ..." />
+            <span asp-validation-for="Address" class="text-danger"></span>
+        </div>
 
-    <label asp-for="ConfirmPassword"></label>
-    <input asp-for="ConfirmPassword" placeholder="Nhập lại mật khẩu..." />
-    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        <div class="form-group">
+            <label asp-for="Password" class="form-label">
+                <i class="fas fa-lock me-2"></i>Mật khẩu
+            </label>
+            <input asp-for="Password" class="form-control" placeholder="Tạo mật khẩu mạnh..." />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
 
-    <label asp-for="RoleType"></label>
-    <select asp-for="RoleType" asp-items="Html.GetEnumSelectList<RoleTypeEnum>()">
-        <option value="">-- Chọn vai trò --</option>
-    </select>
-    <span asp-validation-for="RoleType" class="text-danger"></span>
+        <div class="form-group">
+            <label asp-for="ConfirmPassword" class="form-label">
+                <i class="fas fa-lock me-2"></i>Xác nhận mật khẩu
+            </label>
+            <input asp-for="ConfirmPassword" class="form-control" placeholder="Nhập lại mật khẩu..." />
+            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        </div>
 
-    <button type="submit" class="success">Đăng ký</button>
-</form>
+        <div class="form-group">
+            <label class="form-label">Vai trò</label>
+            <div class="role-selection">
+                <div class="role-option">
+                    <input type="radio" asp-for="RoleType" value="@RoleTypeEnum.Customer" id="roleCustomer" checked />
+                    <label class="role-label" for="roleCustomer">
+                        <i class="fas fa-user role-icon"></i>
+                        <span class="role-name">Người mua</span>
+                        <span class="role-description">Tham gia đấu giá</span>
+                    </label>
+                </div>
+                <div class="role-option">
+                    <input type="radio" asp-for="RoleType" value="@RoleTypeEnum.Seller" id="roleSeller" />
+                    <label class="role-label" for="roleSeller">
+                        <i class="fas fa-store role-icon"></i>
+                        <span class="role-name">Người bán</span>
+                        <span class="role-description">Đăng sản phẩm</span>
+                    </label>
+                </div>
+            </div>
+            <span asp-validation-for="RoleType" class="text-danger"></span>
+        </div>
 
-<div class="auth-footer">
-    <p>Đã có tài khoản? <a asp-action="Login">Đăng nhập ngay</a></p>
+        <button type="submit" class="btn-auth btn-primary" id="registerButton">
+            <i class="fas fa-user-plus me-2"></i>Tạo Tài Khoản
+        </button>
+    </form>
+
+    <div class="auth-separator">
+        <span>Đã có tài khoản?</span>
+    </div>
+
+    <div class="text-center">
+        <a asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" class="btn-auth btn-outline">
+            <i class="fas fa-sign-in-alt me-2"></i>Đăng Nhập
+        </a>
+    </div>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function() {
+            $('#registerForm').on('submit', function() {
+                var btn = $('#registerButton');
+                btn.prop('disabled', true).addClass('btn-loading');
+                btn.html('<i class="fas fa-spinner fa-spin me-2"></i>Đang tạo tài khoản...');
+            });
+
+            // Password strength indicator
+            $('#Password').on('input', function() {
+                var password = $(this).val();
+                var strength = 0;
+
+                if (password.length >= 6) strength++;
+                if (password.match(/[a-z]/)) strength++;
+                if (password.match(/[A-Z]/)) strength++;
+                if (password.match(/[0-9]/)) strength++;
+                if (password.match(/[^a-zA-Z0-9]/)) strength++;
+
+                // You can add visual feedback for password strength here
+            });
+
+            // Clear validation on input
+            $('.form-control').on('input', function() {
+                $(this).removeClass('is-invalid');
+                $(this).closest('.form-group').find('.text-danger').hide();
+            });
+        });
+    </script>
 }

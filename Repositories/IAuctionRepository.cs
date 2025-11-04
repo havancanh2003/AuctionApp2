@@ -5,14 +5,16 @@ namespace MyApp.Repositories
 {
     public interface IAuctionRepository
     {
-        IEnumerable<Auction> GetAll();
-        IEnumerable<Auction> GetApprovedAuctions();
-        IEnumerable<Auction> GetActiveAuctions();
-        List<Auction> GetAllAuctionsWithDetails();
-        void UpdateStatus(int auctionId, AuctionStatus status);
-        Auction GetById(int id);
-        void Add(Auction auction);
-        void Update(Auction auction);
-        void Save();
+        Task<IEnumerable<Auction>> GetAllAsync();
+        Task<IEnumerable<Auction>> GetApprovedAuctionsAsync();
+        Task<IEnumerable<Auction>> GetActiveAuctionsAsync();
+        Task<IEnumerable<Auction>> GetAuctionsByUserIdAsync(int userId);
+        Task<List<Auction>> GetAllAuctionsWithDetailsAsync();
+        Task UpdateStatusAsync(int auctionId, AuctionStatus status);
+        Task<Auction> GetByIdAsync(int id);
+        Task<Auction> GetByIdWithDetailsAsync(int id);
+        Task AddAsync(Auction auction);
+        Task UpdateAsync(Auction auction);
+        Task SaveAsync();
     }
 }

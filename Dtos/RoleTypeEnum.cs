@@ -1,4 +1,4 @@
-﻿namespace MyApp.Models
+﻿namespace MyApp.Dtos
 {
     public enum RoleTypeEnum
     {

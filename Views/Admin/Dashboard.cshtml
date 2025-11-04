@@ -1,4 +1,233 @@
-﻿@{
+﻿@* @model MyApp.Dtos.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
-Dashboard
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header mb-4">
+        <h1 class="page-title">
+            <i class="fas fa-tachometer-alt me-2"></i>
+            Dashboard Quản Trị
+        </h1>
+        <p class="page-subtitle text-muted">Tổng quan về hệ thống đấu giá</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row">
+        <!-- Users Statistics -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Tổng Người Dùng
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalUsers</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Người Dùng Hoạt Động
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.ActiveUsers</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-check fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Người Dùng Mới (Hôm nay)
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.NewUsersToday</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-plus fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Doanh Thu
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalRevenue.ToString("N0") ₫</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts and Additional Stats -->
+    <div class="row">
+        <!-- Users by Role -->
+        <div class="col-xl-6 col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Người Dùng Theo Vai Trò</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie pt-4 pb-2">
+                        <canvas id="userRoleChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-center small">
+                        @foreach (var role in Model.UsersByRole)
+                        {
+                            <span class="mr-3">
+                                <i class="fas fa-circle @GetRoleColor(role.Key)"></i> @role.Key: @role.Value
+                            </span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-xl-6 col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Thao Tác Nhanh</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <a asp-controller="Admin" asp-action="UserManagement" class="btn btn-primary btn-block">
+                                <i class="fas fa-users me-2"></i>Quản Lý Người Dùng
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a asp-controller="Auction" asp-action="Index" class="btn btn-success btn-block">
+                                <i class="fas fa-gavel me-2"></i>Quản Lý Đấu Giá
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a asp-controller="Payment" asp-action="Index" class="btn btn-info btn-block">
+                                <i class="fas fa-credit-card me-2"></i>Quản Lý Thanh Toán
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a asp-controller="Bid" asp-action="Index" class="btn btn-warning btn-block">
+                                <i class="fas fa-hammer me-2"></i>Lịch Sử Đấu Giá
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Hoạt Động Gần Đây</h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center py-4">
+                        <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">Tính năng đang phát triển</h5>
+                        <p class="text-muted">Phần hoạt động gần đây sẽ được cập nhật trong phiên bản tiếp theo.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        $(document).ready(function() {
+            // User Role Chart
+            var ctx = document.getElementById('userRoleChart').getContext('2d');
+            var userRoleChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: @Html.Raw(Json.Serialize(Model.UsersByRole.Keys)),
+                    datasets: [{
+                        data: @Html.Raw(Json.Serialize(Model.UsersByRole.Values)),
+                        backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e'],
+                        hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf', '#dda20a'],
+                        hoverBorderColor: "rgba(234, 236, 244, 1)",
+                    }],
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    tooltips: {
+                        backgroundColor: "rgb(255,255,255)",
+                        bodyFontColor: "#858796",
+                        borderColor: '#dddfeb',
+                        borderWidth: 1,
+                        xPadding: 15,
+                        yPadding: 15,
+                        displayColors: false,
+                        caretPadding: 10,
+                    },
+                    legend: {
+                        display: false
+                    },
+                    cutoutPercentage: 80,
+                },
+            });
+
+            // Auto-refresh statistics every 2 minutes
+            setInterval(function() {
+                $.get('@Url.Action("GetUserStatistics", "Admin")', function(data) {
+                    if (!data.error) {
+                        // Update statistics cards
+                        $('.card-border-left-primary .h5').text(data.totalUsers);
+                        $('.card-border-left-success .h5').text(data.activeUsers);
+                        $('.card-border-left-info .h5').text(data.newUsersToday);
+                        $('.card-border-left-warning .h5').text(data.totalRevenue.toLocaleString() + ' ₫');
+                    }
+                });
+            }, 120000);
+        });
+    </script>
+}
+
+@functions {
+    public string GetRoleColor(string role)
+    {
+        return role switch
+        {
+            "Admin" => "text-primary",
+            "Seller" => "text-success",
+            "Customer" => "text-info",
+            _ => "text-secondary"
+        };
+    }
+} *@

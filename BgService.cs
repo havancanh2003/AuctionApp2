@@ -23,13 +23,13 @@ namespace MyApp
                 var bidRepo = scope.ServiceProvider.GetRequiredService<IBidRepository>();
                 var paymentRepo = scope.ServiceProvider.GetRequiredService<IPaymentRepository>();
 
-                var expiredAuctions = auctionRepo.GetAll()
+                var expiredAuctions = (await auctionRepo.GetAllAsync())
                     .Where(a => a.Status == AuctionStatus.Approved && a.TimeEnd <= DateTime.Now)
                     .ToList();
 
                 foreach (var auction in expiredAuctions)
                 {
-                    var highestBid = bidRepo.GetHighestBidForAuction(auction.Id);
+                    var highestBid = await bidRepo.GetHighestBidForAuctionAsync(auction.Id);
                     if (highestBid != null)
                     {
                         var payment = new Payment
@@ -39,15 +39,16 @@ namespace MyApp
                             Price = highestBid.Price,
                             CreatedAt = DateTime.Now
                         };
-                        paymentRepo.Add(payment);
+                        await paymentRepo.AddAsync(payment);
                     }
 
                     auction.Status = AuctionStatus.Closed;
-                    auctionRepo.Update(auction);
+                    await auctionRepo.UpdateAsync(auction);
                 }
 
-                auctionRepo.Save();
-                paymentRepo.Save();
+                
+                await auctionRepo.SaveAsync();
+                await paymentRepo.SaveAsync();
 
                 await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken); // kiểm tra mỗi phút
             }

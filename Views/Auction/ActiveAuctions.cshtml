@@ -1,46 +1,399 @@
 @model IEnumerable<MyApp.Models.Auction>
-@section Styles {
-
-<style>
-  @* .table-hover-row:hover {
-    background-color:rgb(34, 134, 227); /* màu xanh Bootstrap */
-    color: rgb(34, 134, 227);
-  } *@
-
-  .table-hover-row:hover td {
-    background-color:rgb(115, 179, 240);
-    color: rgb(1, 5, 9);
-  }
-
-  .table-hover-row {
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-</style>
-
+@{
+    ViewData["Title"] = "Phiên Đấu Giá Đang Diễn Ra";
 }
-<h2 class="text-center">Phiên đấu giá đang diễn ra</h2>
 
-<table class="table">
-    <thead>
-        <tr class="text-center">
-            <th>Tiêu đề</th>
-            <th>Ảnh</th>
-            <th>Mô tả</th>
-            <th>Kết thúc</th>
-            <th>Giá Khởi Điểm</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var auction in Model)
-        {
-            <tr class="table-hover-row" style="cursor:pointer;" onclick="window.location.href='@Url.Action("Details", "Auction", new { id = auction.Id })'">
+<div class="container">
+    <div class="page-header mb-5">
+        <h1 class="page-title text-center">
+            <i class="fas fa-bolt text-warning me-2"></i>
+            @ViewData["Title"]
+        </h1>
+        <p class="page-subtitle text-center text-muted">Tham gia ngay các phiên đấu giá đang diễn ra với nhiều sản phẩm hấp dẫn</p>
+    </div>
 
-                <td>@auction.Name</td>
-                <td><img src="@auction.ImgUrl" alt="Ảnh sản phẩm @auction.Name" class="img-fluid" style="max-height: 100px;" /></td>
-                <td>@auction.Description</td>
-                <td>@auction.TimeEnd.ToString("dd/MM/yyyy HH:mm")</td>
-                <td>@auction.PriceStart.ToString("N0") VNĐ</td>
-            </tr>
+    @if (!Model.Any())
+    {
+        <div class="empty-state text-center py-5">
+            <i class="fas fa-clock fa-3x text-muted mb-3"></i>
+            <h3 class="text-muted">Hiện không có phiên đấu giá nào</h3>
+            <p class="text-muted mb-4">Không có phiên đấu giá nào đang diễn ra vào lúc này.</p>
+            <a asp-controller="Auction" asp-action="ApprovedAuctions" class="btn btn-primary">
+                <i class="fas fa-calendar-alt me-2"></i>Xem lịch đấu giá sắp tới
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var auction in Model)
+            {
+                var timeRemaining = auction.TimeEnd - DateTime.Now;
+                var hoursRemaining = timeRemaining.TotalHours;
+                var progressPercentage = Math.Max(0, Math.Min(100, (1 - (timeRemaining.TotalHours / (auction.TimeEnd - auction.TimeStart).TotalHours)) * 100));
+
+                <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+                    <div class="auction-card card h-100 shadow-sm" onclick="window.location.href='@Url.Action("Details", "Auction", new { id = auction.Id })'" style="cursor: pointer;">
+                        <div class="card-img-container position-relative">
+                            <img src="@auction.ImgUrl" class="card-img-top" alt="@auction.Name"
+                                 style="height: 200px; object-fit: cover;">
+                            <div class="card-img-overlay d-flex justify-content-between align-items-start p-3">
+                                <span class="badge bg-success">
+                                    <i class="fas fa-play-circle me-1"></i>Đang diễn ra
+                                </span>
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-clock me-1"></i>
+                                    @if (hoursRemaining > 24)
+                                    {
+                                        <text>@Math.Floor(hoursRemaining / 24) ngày</text>
+                                    }
+                                    else if (hoursRemaining > 1)
+                                    {
+                                        <text>@Math.Floor(hoursRemaining) giờ</text>
+                                    }
+                                    else
+                                    {
+                                        <text>@Math.Floor(timeRemaining.TotalMinutes) phút</text>
+                                    }
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-truncate" title="@auction.Name">@auction.Name</h5>
+                            <p class="card-text text-muted flex-grow-1">
+                                @if (auction.Description.Length > 100)
+                                {
+                                    @auction.Description.Substring(0, 100)
+                        
+                                    <text>...</text>
+                                }
+                                else
+                                {
+                                    @auction.Description
+                                }
+                            </p>
+
+                            <!-- Progress Bar -->
+                            <div class="auction-progress mb-3">
+                                <div class="d-flex justify-content-between small text-muted mb-1">
+                                    <span>Thời gian còn lại</span>
+                                    <span>
+                                        @if (hoursRemaining > 24)
+                                        {
+                                            @Math.Floor(hoursRemaining / 24)
+                                            <text>d </text>
+
+                                            @(Math.Floor(hoursRemaining % 24))
+                                
+                                            <text>h</text>
+                                        }
+                                        else if (hoursRemaining > 1)
+                                        {
+                                            @Math.Floor(hoursRemaining)
+                                            <text>h </text>
+
+                                            @(Math.Floor((hoursRemaining % 1) * 60))
+                                
+                                            <text>m</text>
+                                        }
+                                        else
+                                        {
+                                            @Math.Floor(timeRemaining.TotalMinutes)
+                                
+                                            <text>m</text>
+                                        }
+                                    </span>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-warning" role="progressbar"
+                                         style="width: @progressPercentage%;"
+                                         aria-valuenow="@progressPercentage"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Auction Info -->
+                            <div class="auction-info mb-3">
+                                <div class="row text-center">
+                                    <div class="col-6">
+                                        <small class="text-muted d-block">Giá khởi điểm</small>
+                                        <span class="fw-bold text-primary">@auction.PriceStart.ToString("N0") ₫</span>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted d-block">Kết thúc lúc</small>
+                                        <span class="fw-bold">@auction.TimeEnd.ToString("HH:mm")</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-transparent border-top-0">
+                            <div class="d-grid">
+                                <button class="btn btn-warning btn-hover" onclick="event.stopPropagation(); window.location.href='@Url.Action("Details", "Auction", new { id = auction.Id })'">
+                                    <i class="fas fa-gavel me-2"></i>Tham gia đấu giá ngay
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Statistics Section -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <h4 class="text-primary mb-1">@Model.Count()</h4>
+                                <small class="text-muted">Phiên đang diễn ra</small>
+                            </div>
+                            <div class="col-md-3">
+                                <h4 class="text-success mb-1">@Model.Count(a => (a.TimeEnd - DateTime.Now).TotalHours < 1)</h4>
+                                <small class="text-muted">Sắp kết thúc</small>
+                            </div>
+                            <div class="col-md-3">
+                                <h4 class="text-info mb-1">@Model.Average(a => a.PriceStart).ToString("N0") ₫</h4>
+                                <small class="text-muted">Giá trung bình</small>
+                            </div>
+                            <div class="col-md-3">
+                                <h4 class="text-warning mb-1">@Model.Min(a => a.PriceStart).ToString("N0") ₫</h4>
+                                <small class="text-muted">Giá thấp nhất</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Styles {
+    <style>
+        .page-header {
+            border-bottom: 3px solid #f8f9fa;
+            padding-bottom: 1.5rem;
         }
-    </tbody>
-</table>
+
+        .page-title {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 2.5rem;
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .auction-card {
+            transition: all 0.3s ease;
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+            .auction-card:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 12px 30px rgba(0,0,0,0.15) !important;
+            }
+
+        .card-img-container {
+            overflow: hidden;
+            position: relative;
+        }
+
+        .auction-card .card-img-top {
+            transition: transform 0.5s ease;
+        }
+
+        .auction-card:hover .card-img-top {
+            transform: scale(1.08);
+        }
+
+        .card-img-overlay .badge {
+            backdrop-filter: blur(10px);
+            background-color: rgba(255,255,255,0.95) !important;
+            color: #000 !important;
+            font-weight: 600;
+            font-size: 0.8rem;
+            padding: 0.5rem 0.75rem;
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-text {
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .auction-progress {
+            margin: 1rem 0;
+        }
+
+        .progress {
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: #e9ecef;
+        }
+
+        .progress-bar {
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .auction-info {
+            border-top: 1px solid #f8f9fa;
+            border-bottom: 1px solid #f8f9fa;
+            padding: 1rem 0;
+        }
+
+        .btn-hover {
+            transition: all 0.3s ease;
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+        }
+
+            .btn-hover:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3);
+            }
+
+        .empty-state {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 20px;
+            padding: 4rem 2rem;
+        }
+
+            .empty-state h3 {
+                margin-bottom: 1rem;
+            }
+
+        /* Responsive adjustments */
+        @@media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .card-img-overlay .badge {
+                font-size: 0.7rem;
+                padding: 0.4rem 0.6rem;
+            }
+
+            .auction-card {
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .page-title {
+                font-size: 1.75rem;
+            }
+
+            .card-body {
+                padding: 1rem;
+            }
+
+            .btn-hover {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Animation for urgent auctions (less than 1 hour remaining) */
+        .badge.bg-danger {
+            animation: pulse 2s infinite;
+        }
+
+        @@keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Hover effect for entire card */
+        .auction-card {
+            position: relative;
+        }
+
+            .auction-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(135deg, rgba(52, 152, 219, 0.1) 0%, rgba(241, 196, 15, 0.1) 100%);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                border-radius: 15px;
+                pointer-events: none;
+            }
+
+            .auction-card:hover::before {
+                opacity: 1;
+            }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        // Auto-refresh the page every 60 seconds to update timers
+        setTimeout(function() {
+            location.reload();
+        }, 60000);
+
+        // Update countdown timers every second
+        function updateCountdowns() {
+            $('.auction-card').each(function() {
+                var endTime = new Date($(this).data('end-time'));
+                var now = new Date();
+                var timeRemaining = endTime - now;
+
+                if (timeRemaining <= 0) {
+                    // Auction ended, reload page
+                    location.reload();
+                    return;
+                }
+
+                var hours = Math.floor(timeRemaining / (1000 * 60 * 60));
+                var minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+
+                var countdownText = '';
+                if (hours > 24) {
+                    countdownText = Math.floor(hours / 24) + ' ngày';
+                } else if (hours > 1) {
+                    countdownText = hours + ' giờ ' + minutes + ' phút';
+                } else {
+                    countdownText = minutes + ' phút';
+                }
+
+                $(this).find('.countdown-timer').text(countdownText);
+            });
+        }
+
+        // Initialize countdowns if needed
+        $(document).ready(function() {
+            // You can add data-end-time attribute to cards and use the updateCountdowns function
+            // setInterval(updateCountdowns, 1000);
+        });
+    </script>
+}

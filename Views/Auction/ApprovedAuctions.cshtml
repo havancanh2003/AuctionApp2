@@ -1,27 +1,204 @@
-@model IEnumerable<MyApp.Models.Auction>
+@model IEnumerable<Auction>
+@{
+    ViewData["Title"] = "Phiên Đấu Giá Đã Được Duyệt";
+}
 
-<h2 class="text-center">Danh sách phiên đấu giá đã duyệt</h2>
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header mb-4">
+                <h1 class="page-title">
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    @ViewData["Title"]
+                </h1>
+                <p class="page-subtitle text-muted">Danh sách các phiên đấu giá đã được phê duyệt và sắp diễn ra</p>
+            </div>
+        </div>
+    </div>
 
-<table class="table">
-    <thead>
-        <tr class="text-center">
-            <th>Tên</th>
-            <th>Hình ảnh</th>
-            <th>Mô tả</th>
-            <th>Thời gian bắt đầu</th>
-            <th>Thời gian kết thúc</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var auction in Model)
-        {
-            <tr>
-                <td>@auction.Name</td>
-                <td><img src="@auction.ImgUrl" alt="Ảnh sản phẩm @auction.Name" class="img-fluid" style="max-height: 100px;" /></td>
-                <td>@auction.Description</td>
-                <td>@auction.TimeStart.ToString("dd/MM/yyyy HH:mm")</td>
-                <td>@auction.TimeEnd.ToString("dd/MM/yyyy HH:mm")</td>
-            </tr>
+    @if (!Model.Any())
+    {
+        <div class="empty-state text-center py-5">
+            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">Chưa có phiên đấu giá nào</h4>
+            <p class="text-muted">Hiện tại không có phiên đấu giá nào đã được duyệt.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var auction in Model)
+            {
+                <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+                    <div class="auction-card card h-100 shadow-sm">
+                        <div class="card-img-container position-relative">
+                            <img src="@auction.ImgUrl" class="card-img-top" alt="@auction.Name"
+                                 style="height: 200px; object-fit: cover;">
+                            <div class="card-img-overlay d-flex justify-content-between align-items-start">
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check me-1"></i>Đã duyệt
+                                </span>
+                                <span class="badge bg-primary">
+                                    <i class="fas fa-clock me-1"></i>
+                                    @{
+                                        var timeRemaining = auction.TimeStart - DateTime.Now;
+                                        if (timeRemaining.TotalDays > 1)
+                                        {
+                                            <text>@timeRemaining.Days ngày</text>
+                                        }
+                                        else if (timeRemaining.TotalHours > 1)
+                                        {
+                                            <text>@timeRemaining.Hours giờ</text>
+                                        }
+                                        else
+                                        {
+                                            <text>Sắp bắt đầu</text>
+                                        }
+                                    }
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title text-truncate">@auction.Name</h5>
+                        <p class="card-text text-muted flex-grow-1">
+                            @(auction.Description.Length > 100 ?
+                                                    auction.Description.Substring(0, 100) + "..." :
+                                                    auction.Description)
+                    </p>
+
+                            <div class="auction-meta mb-3">
+                                <div class="row text-center">
+                                    <div class="col-6">
+                                        <small class="text-muted">Giá khởi điểm</small>
+                                        <div class="fw-bold text-primary">@auction.PriceStart.ToString("N0") ₫</div>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">Thời gian</small>
+                                        <div class="fw-bold">@auction.TimeStart.ToString("HH:mm")</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="auction-timeline mb-3">
+                                <div class="timeline-bar">
+                                    <div class="timeline-progress" style="width: 0%"></div>
+                                </div>
+                                <div class="d-flex justify-content-between small text-muted">
+                                    <span>Bắt đầu: @auction.TimeStart.ToString("dd/MM")</span>
+                                    <span>Kết thúc: @auction.TimeEnd.ToString("dd/MM")</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-transparent">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <a asp-controller="Auction" asp-action="Details" asp-route-id="@auction.Id"
+                                       class="btn btn-outline-primary w-100">
+                                        <i class="fas fa-eye me-1"></i>Chi tiết
+                                    </a>
+                                </div>
+                                <div class="col-6">
+                            @if (auction.TimeStart <= DateTime.Now && auction.TimeEnd >= DateTime.Now)
+                                    {
+                                        <a asp-controller="Auction" asp-action="Details" asp-route-id="@auction.Id"
+                                           class="btn btn-success w-100">
+                                            <i class="fas fa-gavel me-1"></i>Tham gia
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-secondary w-100" disabled>
+                                            <i class="fas fa-clock me-1"></i>Chờ bắt đầu
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Styles {
+    <style>
+        .auction-card {
+            transition: all 0.3s ease;
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
         }
-    </tbody>
-</table>
+
+            .auction-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+            }
+
+        .card-img-container {
+            overflow: hidden;
+        }
+
+        .auction-card .card-img-top {
+            transition: transform 0.3s ease;
+        }
+
+        .auction-card:hover .card-img-top {
+            transform: scale(1.05);
+        }
+
+        .card-img-overlay .badge {
+            backdrop-filter: blur(10px);
+            background-color: rgba(255,255,255,0.9) !important;
+            color: #000 !important;
+        }
+
+        .auction-timeline {
+            margin: 1rem 0;
+        }
+
+        .timeline-bar {
+            height: 6px;
+            background-color: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2c3e50);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .page-header {
+            border-bottom: 2px solid #f8f9fa;
+            padding-bottom: 1rem;
+        }
+
+        .page-title {
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .empty-state {
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .auction-meta {
+            border-top: 1px solid #f8f9fa;
+            border-bottom: 1px solid #f8f9fa;
+            padding: 1rem 0;
+        }
+
+        .btn {
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+    </style>
+}

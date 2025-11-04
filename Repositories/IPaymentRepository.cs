@@ -1,16 +1,15 @@
+using Microsoft.EntityFrameworkCore;
 using MyApp.Models;
-using System.Collections.Generic;
 
-namespace MyApp.Repositories
+public interface IPaymentRepository
 {
-    public interface IPaymentRepository
-    {
-        IEnumerable<Payment> GetAll();
-        List<Payment> GetAllPaymentsWithDetails();
-
-        Payment GetById(int id);
-        void UpdateStatus(int paymentId, PaymentStatus newStatus);
-        void Add(Payment payment);
-        void Save();
-    }
+    Task<IEnumerable<Payment>> GetAllAsync();
+    Task<List<Payment>> GetAllPaymentsWithDetailsAsync();
+    Task<List<Payment>> GetPaymentsByUserIdAsync(int userId);
+    Task<Payment> GetByIdAsync(int id);
+    Task<Payment> GetPaymentByAuctionIdAsync(int auctionId);
+    Task<Dictionary<string, int>> GetPaymentStatisticsAsync();
+    Task UpdateStatusAsync(int paymentId, PaymentStatus newStatus);
+    Task AddAsync(Payment payment);
+    Task SaveAsync();
 }
