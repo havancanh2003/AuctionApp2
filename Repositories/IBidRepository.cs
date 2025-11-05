@@ -13,4 +13,7 @@ public interface IBidRepository
     Task UpdateAsync(Bid bid);
     Task UpdateAllBidsToLosingAsync(int auctionId);
     Task SaveAsync();
+    Task<string> GenerateBidCodeAsync();
+    Task DeleteBidAsync(int bidId);
+    Task<Bid> GetBidWithAuctionAsync(int bidId);
 }

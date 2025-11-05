@@ -185,5 +185,54 @@ namespace MyApp.Controllers
             var currentPrice = highestBid?.Price ?? auction?.PriceStart ?? 0;
             return Json(new { currentPrice });
         }
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteBid(int id)
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+                {
+                    return Json(new { success = false, message = "Người dùng không hợp lệ." });
+                }
+
+                var bid = await _bidRepository.GetBidWithAuctionAsync(id);
+                if (bid == null)
+                {
+                    return Json(new { success = false, message = "Lượt đấu giá không tồn tại." });
+                }
+
+                // Kiểm tra user có sở hữu bid này không
+                if (bid.UserID != userId)
+                {
+                    return Json(new { success = false, message = "Bạn không có quyền xóa lượt đấu giá này." });
+                }
+
+                // Kiểm tra auction đã kết thúc chưa
+                if (bid.Auction.TimeEnd < DateTime.Now || bid.Auction.Status == AuctionStatus.Closed)
+                {
+                    return Json(new { success = false, message = "Không thể xóa lượt đấu giá của phiên đã kết thúc." });
+                }
+
+                // Kiểm tra nếu là winning bid
+                if (bid.IsWinning)
+                {
+                    return Json(new { success = false, message = "Không thể xóa lượt đấu giá đang thắng." });
+                }
+
+                await _bidRepository.DeleteBidAsync(id);
+                await _bidRepository.SaveAsync();
+
+                _logger.LogInformation("User {UserId} deleted bid {BidId}", userId, id);
+                return Json(new { success = true, message = "Xóa lượt đấu giá thành công!" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting bid {BidId}", id);
+                return Json(new { success = false, message = "Đã xảy ra lỗi khi xóa lượt đấu giá." });
+            }
+        }
     }
 }
