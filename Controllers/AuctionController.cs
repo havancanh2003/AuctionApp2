@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MyApp.Dtos;
 using MyApp.Models;
 using MyApp.Repositories;
 using System.Security.Claims;
@@ -140,5 +141,92 @@ public class AuctionController : Controller
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
         var biddingHistory = await _bidRepository.GetBidHistoryByAuctionAsync(userId);
         return View(biddingHistory);
+    }
+    //[HttpPost]
+    //[Authorize]
+    //[ValidateAntiForgeryToken]
+    //public async Task<IActionResult> DeleteAuction(int id)
+    //{
+    //    try
+    //    {
+    //        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+    //        var auction = await _auctionRepository.GetByIdAsync(id);
+
+    //        if (auction == null)
+    //        {
+    //            return Json(new { success = false, message = "Phiên đấu giá không tồn tại." });
+    //        }
+
+    //        // Check if user owns the auction
+    //        if (auction.UserId != userId)
+    //        {
+    //            return Json(new { success = false, message = "Bạn không có quyền xóa phiên đấu giá này." });
+    //        }
+
+    //        // Only allow deletion for pending or rejected auctions
+    //        if (auction.Status != AuctionStatus.Pending && auction.Status != AuctionStatus.Rejected)
+    //        {
+    //            return Json(new { success = false, message = "Chỉ có thể xóa phiên đấu giá đang chờ duyệt hoặc bị từ chối." });
+    //        }
+
+    //        _auctionRepository.Delete(auction);
+    //        await _auctionRepository.SaveAsync();
+
+    //        _logger.LogInformation("User {UserId} deleted auction {AuctionId}", userId, id);
+    //        return Json(new { success = true, message = "Xóa phiên đấu giá thành công!" });
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        _logger.LogError(ex, "Error deleting auction {AuctionId}", id);
+    //        return Json(new { success = false, message = "Đã xảy ra lỗi khi xóa phiên đấu giá." });
+    //    }
+    //}
+
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> Edit(int id)
+    {
+        try
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var auction = await _auctionRepository.GetByIdAsync(id);
+
+            if (auction == null)
+            {
+                return NotFound();
+            }
+
+            if (auction.UserId != userId)
+            {
+                return Forbid();
+            }
+
+            // Only allow editing for pending auctions
+            if (auction.Status != AuctionStatus.Pending)
+            {
+                TempData["ErrorMessage"] = "Chỉ có thể chỉnh sửa phiên đấu giá đang chờ duyệt.";
+                return RedirectToAction(nameof(MyAuctions));
+            }
+
+            // Map to edit view model
+            var model = new AuctionEditViewModel
+            {
+                Id = auction.Id,
+                Name = auction.Name,
+                Description = auction.Description,
+                ImgUrl = auction.ImgUrl,
+                PriceStart = auction.PriceStart,
+                TimeStart = auction.TimeStart,
+                TimeEnd = auction.TimeEnd
+            };
+
+            return View(model);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error loading edit page for auction {AuctionId}", id);
+            TempData["ErrorMessage"] = "Đã xảy ra lỗi khi tải trang chỉnh sửa.";
+            return RedirectToAction(nameof(MyAuctions));
+        }
     }
 }

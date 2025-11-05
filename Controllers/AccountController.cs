@@ -237,6 +237,61 @@ namespace MyApp.Controllers
 
             return View(model);
         }
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Profile(ProfileViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                // Update user information
+                user.Name = model.Name.Trim();
+                user.PhoneNumber = model.Phone;
+                user.Address = model.Address;
+
+                // Update email if changed
+                if (model.Email != user.Email)
+                {
+                    user.Email = model.Email;
+                    user.UserName = model.Email;
+                    user.NormalizedEmail = model.Email.ToUpper();
+                    user.NormalizedUserName = model.Email.ToUpper();
+                }
+
+                var result = await _userManager.UpdateAsync(user);
+
+                if (result.Succeeded)
+                {
+                    TempData["SuccessMessage"] = "Cập nhật hồ sơ thành công!";
+                    return RedirectToAction(nameof(Profile));
+                }
+
+                // If update failed, add errors to ModelState
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the error
+                _logger.LogError(ex, "Error updating profile for user {UserId}", User.Identity.Name);
+                ModelState.AddModelError(string.Empty, "Đã xảy ra lỗi khi cập nhật hồ sơ. Vui lòng thử lại.");
+            }
+
+            return View(model);
+        }
 
         private IActionResult RedirectToLocal(string? returnUrl)
         {

@@ -104,7 +104,7 @@
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a class="dropdown-item" asp-area="" asp-controller="Profile" asp-action="Index">
+                                        <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Profile">
                                             <i class="fas fa-user-circle me-2"></i>Hồ sơ
                                         </a>
                                     </li>
@@ -146,7 +146,7 @@
     <div class="container main-content">
         <main role="main" class="pb-3">
             <!-- Breadcrumb -->
-            <nav aria-label="breadcrumb" class="mb-4">
+            @* <nav aria-label="breadcrumb" class="mb-4">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
                     @if (ViewContext.RouteData.Values["controller"]?.ToString() != "Home")
@@ -161,7 +161,7 @@
                         <li class="breadcrumb-item active">@ViewContext.RouteData.Values["action"]</li>
                     }
                 </ol>
-            </nav>
+            </nav> *@
 
             @RenderBody()
         </main>
